@@ -35,6 +35,16 @@ Todo lo editable está al principio del `<script>` en `index.html`:
 
 Las reglas de recomendación están en `computeResult`, `computeSecondaryFor` y funciones asociadas.
 
+## Objetivos con selección múltiple (versión 2026-10-21)
+
+La pregunta de objetivos (`q6`) permite elegir hasta 3 opciones; "No estoy seguro/a" es excluyente. Si se elige más de una, aparece `q6prio` ("¿cuál es el más importante para vos hoy?") y ese objetivo define el programa principal con las reglas de siempre. El siguiente paso sale primero de los otros objetivos marcados (si llevan a otro programa no cursado) y, si no, de `computeSecondaryFor`.
+
+**Orden para publicar el cambio** (el `doPost` escribe en orden fijo según `COLUMNAS`):
+
+1. En la hoja **Respuestas**, insertar una columna a la derecha de "Objetivo principal". Encabezados: I = *Objetivos elegidos*, J = *Objetivo prioritario*.
+2. Pegar el `apps-script/Codigo.gs` actualizado y publicar **nueva versión** de la implementación existente (no una nueva implementación).
+3. Recién después, mergear a `main` para que Vercel publique el `index.html`.
+
 ## Notas técnicas
 
 - El envío usa `fetch` con `mode: "no-cors"` y `Content-Type: text/plain`: Apps Script no responde el preflight de CORS, así que el envío es "dispara y olvida" (la página no puede leer la respuesta). Para verificar, mirar la hoja o *Ejecuciones* en Apps Script.
