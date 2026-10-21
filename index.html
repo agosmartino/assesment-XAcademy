@@ -415,6 +415,13 @@
   }
 </style>
 
+<style id="objetivos-multiseleccion">
+  .qhint { margin: -18px 0 18px; font-size: 0.95rem; color: var(--text-muted); }
+  .qhint .qcount { margin-left: 6px; font-weight: 600; color: var(--accent-2); }
+  .opt.locked { opacity: 0.45; cursor: not-allowed; }
+  .opt.locked:hover { border-color: var(--border); background: var(--surface); }
+</style>
+
 </head>
 <body>
   <div class="brand-logo"><img src="logo.webp" width="130" height="42" alt="Technology With Purpose Foundation"></div>
@@ -552,6 +559,12 @@ const CC_CONTACT_URL = "";
 const CC_CONTACT_LABEL = "Contactar al equipo";
 
 // ---------- PREGUNTAS ----------
+// Q6 (objetivo) es de selección múltiple: hasta OBJ_MAX opciones.
+// "No estoy seguro/a" (índice OBJ_NO_SE) es excluyente con las demás.
+// Si la persona elige más de una, aparece q6prio para desempatar.
+const OBJ_MAX = 3;
+const OBJ_NO_SE = 8;
+
 const QUESTIONS = {
   q1: { num: "1 de 11", text: "¿Cuál es tu situación laboral actual?", options: [
     "Trabajo en relación de dependencia","Soy emprendedor/a o trabajo por cuenta propia","Estoy buscando trabajo activamente","Soy estudiante","No estoy trabajando en este momento"
@@ -574,7 +587,8 @@ const QUESTIONS = {
   q5: { num: "6 de 11", text: "¿Alguna vez usaste herramientas de Inteligencia Artificial como ChatGPT, Gemini u otras?", options: [
     "No, nunca","Las probé una o dos veces pero no les encontré la vuelta","Las uso de vez en cuando para tareas puntuales","Las uso regularmente como parte de mi trabajo o estudio"
   ]},
-  q6: { num: "7 de 11", text: "¿Cuál es tu principal objetivo al hacer una formación con Technology With Purpose?", options: [
+  q6: { num: "7 de 11", text: "¿Cuáles son tus principales objetivos al hacer una formación con Technology With Purpose?", type: "multi", max: OBJ_MAX, exclusive: OBJ_NO_SE,
+    hint: `Podés elegir hasta ${OBJ_MAX} opciones.`, options: [
     "Mejorar mis habilidades digitales para el trabajo o negocio actual",
     "Moverme con más seguridad y autonomía en el mundo digital (estafas, IA, privacidad en redes, trámites), para mí o para acompañar a otros en mi trabajo, mis clases o mi entorno",
     "Aprender a automatizar tareas repetitivas sin necesidad de programar",
@@ -585,6 +599,8 @@ const QUESTIONS = {
     "Crear mis propias aplicaciones con inteligencia artificial, sin necesidad de programar",
     "No estoy seguro/a"
   ]},
+  // Las opciones salen de lo que la persona marcó en q6 (mismos índices).
+  q6prio: { num: "7.ter", text: "De estos objetivos, ¿cuál es el más importante para vos hoy?", optionsFrom: "q6" },
   bis: { num: "7.bis", text: "¿Te imaginás más cerca de usar mejor la tecnología en lo que ya hacés, o de aprender algo técnico nuevo desde cero?", options: [
     "Usar mejor la tecnología en lo que ya hago","Aprender algo técnico nuevo desde cero"
   ]},
@@ -606,6 +622,25 @@ let answers = {};
 let path = ["q1","q2","cap","q3","q4","q5","q6"];
 let currentIndex = 0;
 
+// ---------- OBJETIVOS (q6 multiselección) ----------
+function objetivosElegidos() { return Array.isArray(answers.q6) ? answers.q6 : []; }
+
+// Objetivo que manda: el único elegido, o el marcado como prioridad en q6prio.
+function objetivoPrincipal() {
+  const sel = objetivosElegidos();
+  if (sel.length > 1 && sel.includes(answers.q6prio)) return answers.q6prio;
+  return sel[0];
+}
+
+// Respuestas con q6 = objetivo principal (número), para que toda la lógica de
+// recomendación siga funcionando igual que con la pregunta de opción única.
+// q6sel guarda todos los objetivos marcados, en el orden en que se eligieron.
+function ans() {
+  return Object.assign({}, answers, { q6sel: objetivosElegidos().slice(), q6: objetivoPrincipal() });
+}
+
+function otrosObjetivos(a) { return (a.q6sel || []).filter(o => o !== a.q6); }
+
 function hizoXAcademy(cap){ return cap===2||cap===3; } // las dos opciones que llevan a la 3.bis
 function isSinProgramacion(q8){ return q8===0||q8===1; } // "nunca" y "tutorial corto" — ninguno puede escribir código funcional
 function isBasicoOFluido(q8){ return q8===2||q8===3; }
@@ -621,6 +656,8 @@ function isIAUsoRegular(q5){ return q5===3; }
 
 function extendPathAfter(qid) {
   const a = answers;
+  const sel = objetivosElegidos();
+  const algunObjetivo = (...ids) => ids.some(i => sel.includes(i));
   const ramifican = ["cap","q6","bis","q8","q9"];
   if (!ramifican.includes(qid)) return;
   const idx = path.indexOf(qid);
@@ -631,18 +668,21 @@ function extendPathAfter(qid) {
     else path.push("q3","q4","q5","q6");
   }
   if (qid === "q6") {
-    if (a.q6 === 8) path.push("bis");
-    else if (a.q6===3||a.q6===4||a.q6===5) path.push("q7","q8");
+    if (sel.length > 1) path.push("q6prio");
+    if (sel.includes(OBJ_NO_SE)) path.push("bis");
+    // Las preguntas técnicas aparecen si CUALQUIERA de los objetivos las necesita,
+    // así también se puede resolver el programa de los objetivos secundarios.
+    else if (algunObjetivo(3,4,5)) path.push("q7","q8");
   }
   if (qid === "bis") {
     if (a.bis === 1) path.push("q7","q8");
   }
   if (qid === "q8") {
-    if (a.q6 === 5) path.push("q9");
+    if (algunObjetivo(5)) path.push("q9");
     else if (!isSinProgramacion(a.q8)) path.push("q9");
   }
   if (qid === "q9") {
-    if (isTestingManualOAuto(a.q9) && a.q6===4) path.push("q10");
+    if (isTestingManualOAuto(a.q9) && algunObjetivo(4)) path.push("q10");
   }
 }
 
@@ -800,8 +840,30 @@ const SECONDARY_ALTERNATIVES = {
   "Sostenibilidad Digital": ["Accesibilidad", "Skills Up", "Ciudadanía Conectada"]
 };
 
+// Programa al que lleva un objetivo de q6, con el resto de las respuestas.
+function programaDeObjetivo(obj, a) {
+  const b = Object.assign({}, a, { q6: obj });
+  switch (obj) {
+    case 0: case 6: return "Skills Up";
+    case 1: return "Ciudadanía Conectada";
+    case 2: return "Workflow Automation";
+    case 7: return "NoCode";
+    case 3: return resolveTechnicalBranch(b);
+    case 4: return resolveProfundizar(b);
+    case 5: return resolveAccesibilidadSost(b);
+    default: return null;
+  }
+}
+
 function pickSecondary(principal, a, excluidos) {
   if (principal === "Ciudadanía Conectada") return null;
+  // 1) Si la persona marcó otros objetivos, el siguiente paso sale de ahí
+  //    (en el orden en que los eligió), siempre que no lo haya cursado.
+  const declarados = otrosObjetivos(a)
+    .map(o => programaDeObjetivo(o, a))
+    .filter(p => p && p !== principal && !excluidos.includes(p));
+  if (declarados.length) return { prog: declarados[0], declarado: true };
+  // 2) Si no, las reglas de siempre.
   const base = computeSecondaryFor(principal, a);
   if (!base) return null;
   const opciones = [base.prog, ...(SECONDARY_ALTERNATIVES[principal] || [])]
@@ -811,8 +873,7 @@ function pickSecondary(principal, a, excluidos) {
   return libre ? { prog: libre } : null;
 }
 
-function resolveTechnicalBranch() {
-  const a = answers;
+function resolveTechnicalBranch(a = ans()) {
   let principal;
   if (isSinProgramacion(a.q8)) principal = "QA Manual";
   else if (isBasicoOFluido(a.q8)) {
@@ -827,8 +888,7 @@ function resolveTechnicalBranch() {
   return principal;
 }
 
-function resolveProfundizar() {
-  const a = answers;
+function resolveProfundizar(a = ans()) {
   let principal;
   if (isSinProgramacion(a.q8)) principal = "QA Manual";
   else if (isBasicoOFluido(a.q8)) {
@@ -839,8 +899,7 @@ function resolveProfundizar() {
   return principal;
 }
 
-function resolveAccesibilidadSost() {
-  const a = answers;
+function resolveAccesibilidadSost(a = ans()) {
   return isTestingManualOAuto(a.q9) ? "Accesibilidad" : "Sostenibilidad Digital";
 }
 
@@ -902,7 +961,7 @@ function computeFraming(a, principal) {
 }
 
 function computeResult() {
-  const a = answers;
+  const a = ans();
   let principal;
 
   if (a.q6===0 || a.q6===6) principal = "Skills Up";
@@ -911,11 +970,11 @@ function computeResult() {
   else if (a.q6===7) principal = "NoCode";
   else if (a.q6===8) {
     if (a.bis===0) principal = "Skills Up";
-    else principal = resolveTechnicalBranch();
+    else principal = resolveTechnicalBranch(a);
   }
-  else if (a.q6===3) principal = resolveTechnicalBranch();
-  else if (a.q6===4) principal = resolveProfundizar();
-  else if (a.q6===5) principal = resolveAccesibilidadSost();
+  else if (a.q6===3) principal = resolveTechnicalBranch(a);
+  else if (a.q6===4) principal = resolveProfundizar(a);
+  else if (a.q6===5) principal = resolveAccesibilidadSost(a);
 
   const excluidos = (hizoXAcademy(a.cap) && Array.isArray(a.capBis))
     ? a.capBis.map(i => QUESTIONS.capBis.options[i]) : [];
@@ -952,7 +1011,7 @@ function computeResult() {
 // URL de la implementación del Apps Script (la que termina en /exec).
 // El script recibe cada resultado por doPost y lo agrega a la hoja "Respuestas".
 const API_URL = "https://script.google.com/macros/s/AKfycbzHSB6jZs4_8qJTu-qOv7i4FnXj7r7nkUQwtZ2w_HmKtbslOVvHvsu59PhAFQS1Fm6i/exec";
-const ASSESSMENT_VERSION = "2026-10-20";
+const ASSESSMENT_VERSION = "2026-10-21-multiobjetivo";
 let resultadoGuardado = false;
 
 function textoRespuesta(qid) {
@@ -961,7 +1020,7 @@ function textoRespuesta(qid) {
   if (!path.includes(qid)) return "";
   const v = answers[qid];
   if (v === undefined) return "";
-  const opts = QUESTIONS[qid].options;
+  const opts = QUESTIONS[qid].optionsFrom ? QUESTIONS[QUESTIONS[qid].optionsFrom].options : QUESTIONS[qid].options;
   if (Array.isArray(v)) return v.map(i => opts[i]).join(", ");
   return opts[v];
 }
@@ -969,11 +1028,15 @@ function textoRespuesta(qid) {
 function guardarRespuesta(r) {
   if (resultadoGuardado) return;
   resultadoGuardado = true;
+  const principalObj = objetivoPrincipal();
   const registro = {
     q1: textoRespuesta("q1"), q2: textoRespuesta("q2"),
     cap: textoRespuesta("cap"), capBis: textoRespuesta("capBis"),
     q3: textoRespuesta("q3"), q4: textoRespuesta("q4"), q5: textoRespuesta("q5"),
-    q6: textoRespuesta("q6"), bis: textoRespuesta("bis"),
+    q6: textoRespuesta("q6"),
+    // Objetivo que definió el resultado (si eligió uno solo, es ese mismo).
+    q6prio: principalObj !== undefined ? QUESTIONS.q6.options[principalObj] : "",
+    bis: textoRespuesta("bis"),
     q7: textoRespuesta("q7"), q8: textoRespuesta("q8"),
     q9: textoRespuesta("q9"), q10: textoRespuesta("q10"),
     principal: r.principal || "",
@@ -1002,23 +1065,50 @@ function renderTrack() {
   ).join('')}</div>`;
 }
 
+// Opciones a mostrar: [{i, label}]. Para q6prio salen de lo marcado en q6.
+function opcionesDe(q) {
+  if (q.optionsFrom) {
+    const base = QUESTIONS[q.optionsFrom].options;
+    const sel = Array.isArray(answers[q.optionsFrom]) ? answers[q.optionsFrom] : [];
+    return sel.map(i => ({ i, label: base[i] }));
+  }
+  return q.options.map((label, i) => ({ i, label }));
+}
+
+// Toggle de selección múltiple con tope y opción excluyente.
+function toggleMulti(q, arr, i) {
+  const p = arr.indexOf(i);
+  if (p >= 0) { arr.splice(p, 1); return; }
+  if (q.exclusive !== undefined) {
+    if (i === q.exclusive) { arr.length = 0; arr.push(i); return; }
+    const ex = arr.indexOf(q.exclusive);
+    if (ex >= 0) arr.splice(ex, 1);
+  }
+  if (q.max && arr.length >= q.max) return;
+  arr.push(i);
+}
+
 function renderQuestion() {
   const qid = path[currentIndex];
   const q = QUESTIONS[qid];
   const isMulti = q.type === "multi";
   if (isMulti && !Array.isArray(answers[qid])) answers[qid] = [];
 
-  const optsHtml = q.options.map((opt,i) => {
+  const lleno = isMulti && q.max && answers[qid].length >= q.max;
+  const optsHtml = opcionesDe(q).map(({i, label}) => {
     const sel = isMulti ? answers[qid].includes(i) : answers[qid]===i;
-    return `<button class="opt${sel?' selected':''}" data-i="${i}">${opt}</button>`;
+    const bloqueada = lleno && !sel && i !== q.exclusive;
+    return `<button class="opt${sel?' selected':''}${bloqueada?' locked':''}" data-i="${i}"${bloqueada?' aria-disabled="true"':''}>${label}</button>`;
   }).join('');
 
   const enabled = isMulti ? answers[qid].length>0 : answers[qid]!==undefined;
+  const hintHtml = q.hint ? `<div class="qhint">${q.hint}${q.max ? ` <span class="qcount">${answers[qid].length} de ${q.max}</span>` : ''}</div>` : '';
 
   document.getElementById('stage').innerHTML = `
     ${renderTrack()}
     <div class="question-num">${q.num}</div>
     <h1 class="qtext">${q.text}</h1>
+    ${hintHtml}
     <div class="options">${optsHtml}</div>
     <div class="nav-row">
       <button class="btn" id="back" ${currentIndex===0?'disabled':''}>Atrás</button>
@@ -1030,9 +1120,12 @@ function renderQuestion() {
     btn.addEventListener('click', () => {
       const i = parseInt(btn.dataset.i);
       if (isMulti) {
-        const arr = answers[qid];
-        const p = arr.indexOf(i);
-        if (p>=0) arr.splice(p,1); else arr.push(i);
+        toggleMulti(q, answers[qid], i);
+        if (qid === "q6") {
+          // Si la prioridad elegida ya no está entre los objetivos, se descarta.
+          if (!answers.q6.includes(answers.q6prio) || answers.q6.length < 2) delete answers.q6prio;
+          extendPathAfter(qid);
+        }
       } else {
         answers[qid] = i;
         extendPathAfter(qid);
@@ -1105,11 +1198,14 @@ function renderResult() {
 
   const framingHtml = r.framing ? `<div style="margin-bottom:22px;color:var(--text-muted);font-style:italic;">${r.framing}</div>` : "";
   const noteHtml = r.excludedNote ? `<div class="flag-note">${r.excludedNote}</div>` : "";
+  const secIntro = r.secondary && r.secondary.declarado
+    ? `Como también es uno de los objetivos que marcaste, una vez que termines (o estés por terminar) ${r.principal}, te sugerimos sumar ${r.secondary.prog}.`
+    : r.secondary ? `Una vez que termines (o estés por terminar) ${r.principal}, te sugerimos sumar ${r.secondary.prog} como siguiente paso.` : "";
   const secHtml = r.secondary ? `
     <div class="next-step">
       <div class="next-step-label">Siguiente paso sugerido</div>
       <div class="next-step-name">${r.secondary.prog}</div>
-      <div class="next-step-why">Una vez que termines (o estés por terminar) ${r.principal}, te sugerimos sumar ${r.secondary.prog} como siguiente paso. ${secondaryDisplayText(r.secondary.prog, answers)}</div>
+      <div class="next-step-why">${secIntro} ${secondaryDisplayText(r.secondary.prog, answers)}</div>
     </div>` : "";
 
   const signupUrl = SIGNUP_URLS[r.principal];
