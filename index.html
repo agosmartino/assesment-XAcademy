@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>¿Por dónde empezar? — Technology With Purpose</title>
+<meta name="description" content="Respondé unas preguntas y descubrí qué programa de XAcademy es para vos.">
+<link rel="icon" href="logo.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-deep: #f6eeff;
+    --surface: #ffffff;
+    --surface-2: #f1edfd;
+    --border: #d9d9d9;
+    --text: #201b24;
+    --text-muted: #8c939c;
+    --accent: #9e23ff;
+    --accent-soft: #f6ecff;
+    --accent-2: #6b53f0;
+    --font-display: 'Inter', -apple-system, sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse at top, var(--bg-deep) 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+  }
+
+  .brand-logo {
+    margin-bottom: 6px;
+  }
+  .brand-logo img {
+    height: 42px;
+    width: auto;
+    display: block;
+  }
+  .brand {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .brand strong { color: var(--text); font-weight: 600; }
+
+  .stage {
+    width: 100%;
+    max-width: 620px;
+  }
+
+  .track {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 34px;
+  }
+  .track-seg {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .track-seg.done { background: var(--accent); }
+
+  .question-num {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--accent-2);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  h1.qtext {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.65rem;
+    line-height: 1.32;
+    margin: 0 0 30px;
+    max-width: 22ch;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    text-align: left;
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.98rem;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  }
+  .opt:hover { border-color: var(--accent-2); background: var(--surface-2); }
+  .opt:active { transform: scale(0.995); }
+  .opt.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+  }
+  .btn {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 12px 22px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .btn.primary:disabled { background: var(--border); border-color: var(--border); color: var(--text-muted); }
+
+  /* ---- Resultado ---- */
+  .result {
+    animation: rise 0.5s ease-out;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-eyebrow {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .result-name {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+    line-height: 1.1;
+    margin: 0 0 6px;
+  }
+  .result-meta {
+    font-size: 0.92rem;
+    color: var(--accent-2);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .result-audience {
+    font-size: 0.92rem;
+    color: var(--accent-2);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+  .result-blurb {
+    font-size: 1.02rem;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 30px;
+  }
+
+  .framing-card {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+  }
+  .framing-label {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--accent-2);
+    margin-bottom: 4px;
+  }
+
+  .next-step {
+    background: var(--surface-2);
+    border: 1px solid #d6cdf7;
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-top: 6px;
+  }
+  .next-step-label {
+    font-size: 0.82rem;
+    color: var(--accent-2);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .next-step-name {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: var(--accent-2);
+  }
+  .next-step-why {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .flag-note {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fbeed2;
+    border: 1px solid #e8c877;
+    color: #6b4a12;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  .restart {
+    display: block;
+    margin: 34px auto 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.86rem;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  @media (max-width: 480px) {
+    h1.qtext { font-size: 1.4rem; }
+    .result-name { font-size: 1.9rem; }
+  }
+</style>
+
+<style id="preguntas-una-linea-texto-mas-grande">
+  /* Preguntas: evitar cortes artificiales entre palabras */
+  h1.qtext {
+    max-width: none !important;
+    width: 100% !important;
+    font-size: clamp(1.55rem, 3vw, 2rem) !important;
+    line-height: 1.28 !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+  }
+
+  /* Texto general ligeramente más grande */
+  .opt {
+    font-size: 1.08rem !important;
+    line-height: 1.42 !important;
+    padding: 15px 20px !important;
+  }
+
+  .btn {
+    font-size: 0.98rem !important;
+  }
+
+  .result-eyebrow {
+    font-size: 0.9rem !important;
+  }
+
+  .result-meta,
+  .result-audience {
+    font-size: 1rem !important;
+  }
+
+  .result-blurb {
+    font-size: 1.1rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .next-step-label {
+    font-size: 0.9rem !important;
+  }
+
+  .next-step-name {
+    font-size: 1.4rem !important;
+  }
+
+  .next-step-why {
+    font-size: 1rem !important;
+    line-height: 1.55 !important;
+  }
+
+  .flag-note {
+    font-size: 0.94rem !important;
+  }
+
+  /* En pantallas angostas, mantener legibilidad sin forzar overflow horizontal */
+  @media (max-width: 700px) {
+    h1.qtext {
+      font-size: 1.5rem !important;
+      max-width: none !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h1.qtext {
+      font-size: 1.35rem !important;
+      line-height: 1.3 !important;
+    }
+
+    .opt {
+      font-size: 1.02rem !important;
+      padding: 13px 16px !important;
+    }
+  }
+</style>
+
+
+<style id="pie-redes">
+  .site-footer {
+    margin-top: auto; padding-top: 48px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px;
+  }
+  .site-footer:empty { display: none; }
+  .site-footer a {
+    color: var(--accent); font-weight: 600; font-size: 0.98rem; text-decoration: none;
+  }
+  .site-footer a:hover { text-decoration: underline; }
+</style>
+
+<style id="aviso-anonimo">
+  .privacy-note { margin-top: 14px; text-align: center; font-size: 0.78rem; color: var(--text-muted); }
+</style>
+
+<style id="boton-inscripcion">
+  .signup-btn {
+    display: inline-block; margin: -8px 0 30px; padding: 13px 30px; border-radius: 999px;
+    background: var(--accent); color: #fff; font-weight: 600; font-size: 1.02rem;
+    text-decoration: none; transition: background 0.15s, transform 0.15s;
+  }
+  .signup-note {
+    margin: -8px 0 30px; padding: 12px 16px; border-radius: 12px;
+    background: var(--surface-2); color: var(--accent-2); font-size: 0.95rem; font-weight: 500;
+  }
+  .signup-btn:hover { background: var(--accent-2); transform: translateY(-1px); }
+  @media (max-width: 480px) { .signup-btn { display: block; text-align: center; } }
+</style>
+
+<style id="talleres-ciudadania-conectada">
+  .cc-label {
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-2); margin: 8px 0 12px;
+  }
+  /* Resultado de Ciudadanía Conectada: todo el bloque usa el mismo ancho (880px)
+     y los talleres se acomodan 3 arriba + 2 abajo centrados */
+  .stage.stage-wide { max-width: 880px; }
+  .cc-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    gap: 14px; margin-bottom: 24px;
+  }
+  .cc-grid .cc-card { grid-column: span 2; }
+  .cc-grid .cc-card:nth-child(4) { grid-column: 2 / span 2; }
+  .cc-grid .cc-card:nth-child(5) { grid-column: 4 / span 2; }
+  .cc-label { text-align: left; }
+  @media (max-width: 700px) {
+    /* En celular: uno al lado del otro con scroll horizontal */
+    .cc-grid {
+      display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+      padding-bottom: 8px; -webkit-overflow-scrolling: touch;
+    }
+    .cc-card { flex: 0 0 230px; scroll-snap-align: start; }
+  }
+  .cc-card {
+    background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--accent);
+    border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px; text-align: left;
+  }
+  .cc-name { font-weight: 700; font-size: 1.02rem; line-height: 1.3; color: var(--text); }
+  .cc-who { font-size: 0.88rem; font-weight: 600; color: var(--accent-2); }
+  .cc-desc { font-size: 0.92rem; line-height: 1.5; color: var(--text); flex: 1; }
+  .cc-meta { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+  .cc-contact {
+    background: var(--surface-2); border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; text-align: left;
+  }
+  .volunteer-mail { margin: -14px 0 30px; font-size: 0.95rem; color: var(--text-muted); }
+  .volunteer-mail a { color: var(--accent); font-weight: 600; }
+  .cc-contact-title { font-weight: 700; font-size: 1.05rem; color: var(--accent-2); margin-bottom: 6px; }
+  .cc-contact-text { font-size: 0.97rem; line-height: 1.55; color: var(--text); }
+  .cc-contact-btn {
+    display: inline-block; margin-top: 12px; padding: 10px 18px; border-radius: 999px;
+    background: var(--accent); color: #fff; font-weight: 600; text-decoration: none;
+  }
+  @media (max-width: 480px) { .cc-card { flex-basis: 78vw; } }
+</style>
+
+<style id="ocultar-por-donde-empezar-y-contadores">
+  .brand {
+    display: none !important;
+  }
+
+  .question-num {
+    display: none !important;
+  }
+</style>
+
+</head>
+<body>
+  <div class="brand-logo"><img src="logo.webp" width="130" height="42" alt="Technology With Purpose Foundation"></div>
+  <div class="stage" id="stage"></div>
+  <footer class="site-footer" id="site-footer"></footer>
+
+<script>
+// ---------- CONTENIDO DE PROGRAMAS ----------
+const PROGRAMS = {
+  "Skills Up": {
+    duration: "6 semanas · virtual, asincrónico",
+    audience: "Pensado para quienes ya trabajan o emprenden y buscan actualizar su perfil profesional.",
+    blurb: "Vas a actualizar tus habilidades digitales aplicadas al trabajo o a tu negocio: herramientas para la organización, la estrategia comercial y la productividad, pensadas para aplicarse desde el primer día."
+  },
+  "Ciudadanía Conectada": {
+    duration: "5 talleres presenciales",
+    audience: "Pensado para cualquier persona, sea cual sea su nivel tecnológico, que quiera cuidarse o cuidar a otros en el mundo digital.",
+    blurb: "Es un programa de talleres para moverte con más seguridad, confianza y autonomía en el mundo digital, y también para acompañar a otros: prevención de estafas, inteligencia artificial, cuidado de adolescentes, convivencia en redes y trámites digitales. Elegí el taller que mejor se ajuste a vos o a las personas con las que trabajás."
+  },
+  "NoCode": {
+    duration: "3 semanas · 3 clases sincrónicas y prácticas",
+    audience: "Pensado para quienes quieren crear sus propias aplicaciones con IA sin saber programar.",
+    blurb: "Vas a crear tus propias aplicaciones con inteligencia artificial en Google AI Studio, sin programar: las vas a generar a partir de una descripción en lenguaje natural, les vas a sumar tus propios documentos e imágenes y las vas a conectar a una base de datos en la nube para que guarden información."
+  },
+  "Workflow Automation": {
+    duration: "2 semanas · virtual sincrónico y práctico",
+    audience: "Pensado para quienes quieren ganar eficiencia en tareas repetitivas sin necesidad de saber programar.",
+    blurb: "Vas a aprender a automatizar tareas repetitivas con herramientas low-code como N8N, sin necesidad de programar — pensado para optimizar procesos y ganar tiempo en tu día a día."
+  },
+  "QA Manual": {
+    duration: "10 semanas · asincrónico + tutorías sincrónicas",
+    audience: "Pensado para personas sin experiencia previa en IT que buscan dar sus primeros pasos en el sector.",
+    blurb: "Vas a dar tus primeros pasos en testing de software: fundamentos de calidad, metodologías ágiles y práctica aplicada — pensado como puerta de entrada al sector IT, sin experiencia previa."
+  },
+  "QA Automatizado": {
+    duration: "10 semanas · virtual sincrónico vía Meet",
+    audience: "Pensado para quienes ya tienen experiencia en testing manual y buscan especializarse en automatización.",
+    blurb: "Vas a profundizar en aseguramiento de calidad de software a través de herramientas y metodologías de automatización, diseñando y ejecutando pruebas automatizadas en entornos reales de trabajo."
+  },
+  "QA AI": {
+    duration: "3 semanas · virtual sincrónico vía Meet",
+    audience: "Pensado para quienes ya testean de forma manual o automatizada y quieren sumar la perspectiva de IA.",
+    blurb: "Vas a especializarte en testing aplicado a inteligencia artificial: herramientas y criterios para testear agentes y soluciones basadas en IA, partiendo de tu experiencia previa en testing manual."
+  },
+  "Dev": {
+    duration: "5 meses · virtual",
+    audience: "Pensado para quienes ya tienen una base de programación y buscan consolidarse como desarrolladores/as.",
+    blurb: "Vas a consolidar tu perfil como desarrollador/a: formación técnica, experiencia práctica y cultura de trabajo IT, pensado para quien ya tiene una base de programación y busca proyectarse en la industria."
+  },
+  "Accesibilidad": {
+    duration: "Virtual",
+    audience: "Pensado para quienes ya tienen conocimientos básicos de testing o QA manual y quieren sumar la perspectiva de accesibilidad.",
+    blurb: "Vas a aprender a integrar accesibilidad digital en proyectos y productos: testing exploratorio, criterios WCAG y el rol del tester de accesibilidad, partiendo de una base de testing o QA manual."
+  },
+  "Sostenibilidad Digital": {
+    duration: "Virtual",
+    audience: "Pensado para perfiles técnicos o de comunicación que quieran sumar una mirada sostenible a su trabajo.",
+    blurb: "Vas a integrar criterios de desarrollo sostenible en proyectos digitales: green software, diseño UX/UI accesible y comunicación climática con storytelling de datos."
+  }
+};
+
+// ---------- LINKS DE INSCRIPCIÓN ----------
+// Pegar entre las comillas el link del formulario de cada programa.
+// Mientras un link esté vacío, el botón "Inscribite" no aparece para ese programa.
+// Ciudadanía Conectada no lleva botón (tiene el bloque de contacto).
+const SIGNUP_URLS = {
+  "Skills Up": "https://docs.google.com/forms/d/e/1FAIpQLSei1vUjS7lfRdNwiZXg5IlPmSZ4IQhXPuHc9_zu3Gyzb7k_LQ/viewform",
+  "NoCode": "https://bit.ly/XAcademyNoCode",
+  "Workflow Automation": "https://bit.ly/XAcademyWA2026",
+  "QA Manual": "https://bit.ly/XAcademyQAM2026",
+  "QA Automatizado": "https://bit.ly/XAcademyQAAutomation2026",
+  "QA AI": "https://bit.ly/QAAI2026",
+  "Dev": "https://bit.ly/XAcademyDEV2026",
+  "Accesibilidad": "",             // sin inscripción abierta: se muestra el aviso de SIGNUP_NOTES
+  "Sostenibilidad Digital": "https://bit.ly/XAcademySostenibilidadDigital"
+};
+
+// Aviso que reemplaza al botón cuando un programa no tiene inscripción abierta.
+// Cuando se abra la inscripción: cargar el link arriba y borrar la línea de acá.
+const SIGNUP_NOTES = {
+  "Accesibilidad": "Por el momento no hay inscripciones abiertas para este programa. Quedate atento/a a la próxima edición."
+};
+
+// ---------- REDES INSTITUCIONALES (pie de página) ----------
+// Pegar cada link entre las comillas. Los que estén vacíos no se muestran.
+// "Escribinos" con mail: "mailto:direccion@dominio.org".
+const SOCIAL_LINKS = [
+  { label: "Sitio web",  url: "https://www.technologywithpurpose.org/" },
+  { label: "LinkedIn",   url: "https://www.linkedin.com/company/technologywithpurpose/" },
+  { label: "Instagram",  url: "https://www.instagram.com/technologywithpurpose/" },
+  { label: "Escribinos", url: "mailto:programa.xacademy@technologywithpurpose.org" }
+];
+
+function renderFooter() {
+  const links = SOCIAL_LINKS.filter(l => l.url);
+  document.getElementById('site-footer').innerHTML = links.map(l =>
+    `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join('');
+}
+
+// ---------- INVITACIÓN A VOLUNTARIADO ----------
+// Aparece cuando la persona marcó en la 3.bis esta cantidad de programas o más.
+const VOLUNTEER_MIN_PROGRAMS = 6;
+// Mail de contacto para voluntariado.
+const VOLUNTEER_EMAIL = "voluntarios@technologywithpurpose.org";
+
+// ---------- TALLERES DE CIUDADANÍA CONECTADA ----------
+// Fuente: Propuesta formativa 2026 TWPF. Se muestran todos como cuadros en el
+// resultado; no hay routing entre talleres (la persona elige).
+const CC_WORKSHOPS = [
+  { name: "Taller de prevención de estafas",
+    who: "Público en general, con especial atención en personas mayores",
+    meta: "Presencial · 2 horas",
+    desc: "Las estafas más frecuentes (WhatsApp, phishing, suplantación de identidad, engaños bancarios) y cómo identificarlas, prevenirlas y actuar." },
+  { name: "Taller de introducción a la IA",
+    who: "Adolescentes y docentes",
+    meta: "Charla-taller presencial · 2 horas",
+    desc: "Una mirada crítica, ética y aplicada sobre la inteligencia artificial, para usarla con responsabilidad en la enseñanza, el aprendizaje y la creación de contenidos." },
+  { name: "Taller para adolescencias en entornos digitales",
+    who: "Adolescentes de 11 a 18 años",
+    meta: "Presencial · 2 encuentros",
+    desc: "Protección de datos personales, privacidad, consentimiento y circulación de contenidos, con actividades adaptadas por edad (11 a 14 y 15 a 18 años)." },
+  { name: "Taller de convivencia y protección en entornos digitales",
+    who: "Juventudes (adolescentes)",
+    meta: "Charla-taller · 2 horas",
+    desc: "Identidad y huella digital: el impacto de lo que hacemos en línea y sus consecuencias en la vida personal y social." },
+  { name: "Taller de ciudadanía digital",
+    who: "Personas adultas y adultas mayores",
+    meta: "Taller participativo · 3 módulos de 2 horas",
+    desc: "Prevención de estafas, billeteras digitales y trámites con aplicaciones como CiDi y Mi Argentina, trabajando sobre casos prácticos." }
+];
+
+// Contacto para que el equipo oriente sobre los talleres. Si se completa
+// (mail como "mailto:..." o un link de WhatsApp/formulario), aparece un botón.
+const CC_CONTACT_URL = "";
+const CC_CONTACT_LABEL = "Contactar al equipo";
+
+// ---------- PREGUNTAS ----------
+const QUESTIONS = {
+  q1: { num: "1 de 11", text: "¿Cuál es tu situación laboral actual?", options: [
+    "Trabajo en relación de dependencia","Soy emprendedor/a o trabajo por cuenta propia","Estoy buscando trabajo activamente","Soy estudiante","No estoy trabajando en este momento"
+  ]},
+  q2: { num: "2 de 11", text: "¿En qué área o rubro te desenvolvés (o te gustaría desenvolverte)?", options: [
+    "Diseño gráfico, comunicación o marketing","Comercio, ventas o emprendimiento","Administración, gestión o servicios","Educación, salud u organizaciones sociales","Tecnología o desarrollo de software","Otro rubro"
+  ]},
+  cap: { num: "3 de 11", text: "¿Hiciste antes algún curso o capacitación relacionada con tecnología, en XAcademy o en otro lugar?", options: [
+    "No, es la primera vez","Sí, en otro lugar (no en XAcademy)","Sí, ya hice otro programa de XAcademy","Sí, en XAcademy y también en otro lugar"
+  ]},
+  capBis: { num: "3.bis", text: "¿Cuál o cuáles programas ya hiciste?", type: "multi", options: [
+    "Skills Up","QA Manual","QA Automatizado","QA AI","Dev","Accesibilidad","Sostenibilidad Digital","Workflow Automation","Ciudadanía Conectada","NoCode"
+  ]},
+  q3: { num: "4 de 11", text: "¿Cómo te sentís cuando tenés que usar una herramienta digital nueva?", options: [
+    "Me genera inseguridad y trato de evitarlo","Lo intento, pero me lleva tiempo y a veces me frustro","Me adapto sin problema; lo nuevo me genera curiosidad","Me entusiasma: aprendo solo/a y suelo ayudar a otros"
+  ]},
+  q4: { num: "5 de 11", text: "¿Usás herramientas de Google (Drive, Docs, Sheets, Meet) en tu trabajo o vida diaria?", options: [
+    "No las uso o casi no las conozco","Las uso para cosas básicas, sin mucha profundidad","Las uso con fluidez en mi trabajo cotidiano","Las uso de forma avanzada (fórmulas, automatizaciones, etc.)"
+  ]},
+  q5: { num: "6 de 11", text: "¿Alguna vez usaste herramientas de Inteligencia Artificial como ChatGPT, Gemini u otras?", options: [
+    "No, nunca","Las probé una o dos veces pero no les encontré la vuelta","Las uso de vez en cuando para tareas puntuales","Las uso regularmente como parte de mi trabajo o estudio"
+  ]},
+  q6: { num: "7 de 11", text: "¿Cuál es tu principal objetivo al hacer una formación con Technology With Purpose?", options: [
+    "Mejorar mis habilidades digitales para el trabajo o negocio actual",
+    "Moverme con más seguridad y autonomía en el mundo digital (estafas, IA, privacidad en redes, trámites), para mí o para acompañar a otros en mi trabajo, mis clases o mi entorno",
+    "Aprender a automatizar tareas repetitivas sin necesidad de programar",
+    "Cambiar de rubro y conseguir trabajo en la industria IT",
+    "Mejorar o profundizar habilidades técnicas que ya tengo",
+    "Incorporar prácticas de accesibilidad o sostenibilidad digital a lo que ya hago",
+    "Aplicar la tecnología a mi emprendimiento o proyecto propio",
+    "Crear mis propias aplicaciones con inteligencia artificial, sin necesidad de programar",
+    "No estoy seguro/a"
+  ]},
+  bis: { num: "7.bis", text: "¿Te imaginás más cerca de usar mejor la tecnología en lo que ya hacés, o de aprender algo técnico nuevo desde cero?", options: [
+    "Usar mejor la tecnología en lo que ya hago","Aprender algo técnico nuevo desde cero"
+  ]},
+  q7: { num: "8 de 11", text: "¿Cuántos meses podés dedicarle de forma sostenida a una formación?", options: [
+    "Hasta 3 meses","Más de 3 meses","Me es indiferente / lo que tenga que durar"
+  ]},
+  q8: { num: "9 de 11", text: "¿Alguna vez programaste, aunque sea de forma básica?", options: [
+    "No, nunca programé","Hice algún tutorial o curso corto, pero no mucho más","Tengo conocimientos básicos o intermedios y puedo escribir código funcional","Programo con fluidez en uno o más lenguajes"
+  ]},
+  q9: { num: "10 de 11", text: "¿Qué experiencia tenés con testing / control de calidad de software?", options: [
+    "No sé qué es / nunca lo practiqué","Conozco el concepto, pero sin práctica real","Tengo experiencia en testing manual","Tengo experiencia en testing automatizado"
+  ]},
+  q10: { num: "11 de 11", text: "¿Qué tan cómodo/a te sentís con la Inteligencia Artificial a nivel técnico?", options: [
+    "Usuario/a (no entiendo el funcionamiento interno)","Conceptos básicos","Trabajo con APIs / integro modelos de IA","Validación y testing de sistemas de IA"
+  ]}
+};
+
+let answers = {};
+let path = ["q1","q2","cap","q3","q4","q5","q6"];
+let currentIndex = 0;
+
+function hizoXAcademy(cap){ return cap===2||cap===3; } // las dos opciones que llevan a la 3.bis
+function isSinProgramacion(q8){ return q8===0||q8===1; } // "nunca" y "tutorial corto" — ninguno puede escribir código funcional
+function isBasicoOFluido(q8){ return q8===2||q8===3; }
+function isFluido(q8){ return q8===3; }
+function isTestingManualOAuto(q9){ return q9===2||q9===3; }
+function isSinTestingORef(q9){ return q9===0||q9===1; }
+function isTecnicoAvanzadoIA(q10){ return q10===2||q10===3; }
+function isDependenciaOEmprendedor(q1){ return q1===0||q1===1; }
+function isBuscandoNoTrabajaEstudiante(q1){ return q1===2||q1===3||q1===4; }
+function isGoogleAvanzado(q4){ return q4===3; }
+function isComodidadEntusiasta(q3){ return q3===3; }
+function isIAUsoRegular(q5){ return q5===3; }
+
+function extendPathAfter(qid) {
+  const a = answers;
+  const ramifican = ["cap","q6","bis","q8","q9"];
+  if (!ramifican.includes(qid)) return;
+  const idx = path.indexOf(qid);
+  path = path.slice(0, idx+1);
+
+  if (qid === "cap") {
+    if (hizoXAcademy(a.cap)) path.push("capBis","q3","q4","q5","q6");
+    else path.push("q3","q4","q5","q6");
+  }
+  if (qid === "q6") {
+    if (a.q6 === 8) path.push("bis");
+    else if (a.q6===3||a.q6===4||a.q6===5) path.push("q7","q8");
+  }
+  if (qid === "bis") {
+    if (a.bis === 1) path.push("q7","q8");
+  }
+  if (qid === "q8") {
+    if (a.q6 === 5) path.push("q9");
+    else if (!isSinProgramacion(a.q8)) path.push("q9");
+  }
+  if (qid === "q9") {
+    if (isTestingManualOAuto(a.q9) && a.q6===4) path.push("q10");
+  }
+}
+
+// ---------- SECUNDARIAS ----------
+// Blurbs cortos de cada programa, para usar en el cuadro de secundaria
+// (distinto del blurb largo que se usa para el programa principal).
+const SHORT_BLURBS = {
+  "Skills Up": "te ayuda a actualizar tus habilidades digitales aplicadas al trabajo o al negocio, con herramientas de organización, estrategia comercial y productividad",
+  "Ciudadanía Conectada": "son talleres sobre prevención de estafas, inteligencia artificial, cuidado digital y trámites en línea, para vos o para transmitirlo a otros",
+  "NoCode": "te enseña a crear tus propias aplicaciones con inteligencia artificial en Google AI Studio, sin necesidad de programar",
+  "Workflow Automation": "te enseña a automatizar tareas repetitivas con herramientas como N8N, sin necesidad de programar",
+  "QA Manual": "te da las bases de testing de software y control de calidad, ideal como puerta de entrada al sector IT",
+  "QA Automatizado": "profundiza en automatización de pruebas de software, con herramientas y metodologías más avanzadas",
+  "QA AI": "te especializa en testear soluciones y agentes basados en inteligencia artificial",
+  "Dev": "te forma como desarrollador/a, combinando programación con cultura de trabajo IT",
+  "Accesibilidad": "te forma en testing de accesibilidad digital, criterios WCAG y diseño inclusivo",
+  "Sostenibilidad Digital": "te forma en green software, diseño UX/UI accesible y comunicación con storytelling de datos"
+};
+
+// Framing personalizado según situación laboral (Q1) — decide si el mensaje
+// habla de "sumar habilidades" o de "aplicarlo en tu trabajo".
+const SECONDARY_FRAMING = [
+  "te va a servir para aplicarlo directamente en tu trabajo actual",
+  "te va a servir para aplicarlo en tu negocio o proyecto",
+  "te va a servir para sumar una habilidad que te diferencie a la hora de buscar trabajo",
+  "te va a servir para sumar una habilidad más a tu formación, antes de salir al mercado laboral",
+  "te va a servir para tenerla lista para cuando retomes una actividad laboral"
+];
+
+function secondaryDisplayText(prog, a) {
+  const blurb = SHORT_BLURBS[prog] || "";
+  // Sin frase "Además…": la personalización ya está en "Para vos".
+  const capBlurb = blurb.charAt(0).toUpperCase() + blurb.slice(1);
+  return `${capBlurb}.`;
+}
+
+function computeSecondaryFor(principal, a) {
+  switch (principal) {
+    case "Ciudadanía Conectada":
+      return { prog:"Skills Up", why:"Comparten una audiencia general no técnica — profundizar en herramientas digitales aplicadas es un paso natural después de un programa introductorio." };
+
+    case "NoCode":
+      return { prog:"Workflow Automation", why:"Continuación natural sin código: de crear aplicaciones a automatizar tareas del día a día." };
+
+    case "Skills Up":
+      if (isIAUsoRegular(a.q5))
+        return { prog:"NoCode", why:"Ya usás IA de forma regular — crear tus propias aplicaciones con IA es un paso natural." };
+      // Las dos condiciones de la tabla apuntan al mismo destino — en la
+      // práctica es un default, no una bifurcación real.
+      if (isGoogleAvanzado(a.q4) && isDependenciaOEmprendedor(a.q1))
+        return { prog:"Workflow Automation", why:"Ya tenés procesos propios en tu trabajo y ya automatizás a nivel básico — encaja directo con lo que ofrece el programa." };
+      if (isComodidadEntusiasta(a.q3))
+        return { prog:"Workflow Automation", why:"Tenés un perfil autodidacta con ganas de seguir explorando, aunque todavía no muestres un uso avanzado." };
+      return { prog:"Workflow Automation", why:"Un buen siguiente paso para seguir sumando eficiencia en tareas del día a día." };
+
+    case "Workflow Automation":
+      if (isIAUsoRegular(a.q5))
+        return { prog:"NoCode", why:"Ya usás IA de forma regular — crear tus propias aplicaciones con IA complementa la automatización." };
+      if (isComodidadEntusiasta(a.q3) && isDependenciaOEmprendedor(a.q1))
+        return { prog:"Skills Up", why:"Ya estás automatizando procesos puntuales; ampliar a habilidades digitales más generales es el paso natural siguiente." };
+      return { prog:"Skills Up", why:"Una base general de habilidades digitales que complementa lo aprendido en automatización." };
+
+    case "QA Manual":
+      // Acá sí hay una franja sin cubrir en la tabla original (las
+      // condiciones apuntan a dos destinos distintos) — default propio:
+      // Workflow Automation, por ser el destino mayoritario (2 de 3 filas).
+      // Confirmar con Agostina si prefiere otro criterio para este caso.
+      if (isDependenciaOEmprendedor(a.q1) && isGoogleAvanzado(a.q4))
+        return { prog:"Workflow Automation", why:"Ya trabajás y ya automatizás — coherente con el contenido del programa." };
+      if (isComodidadEntusiasta(a.q3))
+        return { prog:"QA Automatizado", why:"Tenés un perfil autodidacta con margen para seguir profundizando dentro de la misma familia técnica." };
+      if (isBuscandoNoTrabajaEstudiante(a.q1))
+        return { prog:"Workflow Automation", why:"Un buen siguiente paso para seguir sumando herramientas aplicables, sin requerir una base de programación." };
+      return { prog:"Workflow Automation", why:"Un buen siguiente paso para seguir sumando herramientas aplicables." };
+
+    case "QA Automatizado":
+      // Misma situación: hueco real, default propio por ser la progresión
+      // natural dentro de la familia de calidad. Confirmar con Agostina.
+      if (isIAUsoRegular(a.q5))
+        return { prog:"QA AI", why:"Ya integrás IA de forma aplicada; es la profundización más natural dentro de la misma familia." };
+      if (isDependenciaOEmprendedor(a.q1) && isGoogleAvanzado(a.q4))
+        return { prog:"Workflow Automation", why:"Ya trabajás y ya automatizás — mismo criterio que en QA Manual." };
+      return { prog:"QA AI", why:"Progresión natural dentro de la misma familia de calidad de software." };
+
+    case "QA AI":
+      if (isDependenciaOEmprendedor(a.q1) && isGoogleAvanzado(a.q4))
+        return { prog:"Workflow Automation", why:"QA AI ya es el punto más avanzado de la familia QA; sumar Workflow Automation es la extensión con más sentido de contenido." };
+      return { prog:"Dev", why:"Un perfil de testing avanzado combinado con conocimientos de desarrollo es muy valorado en equipos ágiles — entender el desarrollo desde el otro lado complementa tu especialización en QA." };
+
+    case "Dev":
+      if (a.q8 === 2) return { prog:"QA Manual", why:"Complementa el desarrollo con fundamentos de calidad de software, a un nivel acorde a tu experiencia." };
+      return { prog:"QA Automatizado", why:"Mismo criterio, con QA Automatizado para aprovechar tu experiencia de programación." };
+
+    case "Accesibilidad":
+      return { prog:"Sostenibilidad Digital", why:"Comparten la misma mirada de tecnología responsable e inclusiva — afinidad temática directa." };
+
+    case "Sostenibilidad Digital":
+      return { prog:"Accesibilidad", why:"Mismo criterio cruzado, en sentido inverso." };
+
+    default: return null;
+  }
+}
+
+function exclusionReplacement(principal, a) {
+  switch (principal) {
+    case "Ciudadanía Conectada": return "Skills Up";
+    case "NoCode": return "Workflow Automation";
+    case "Skills Up": return "Workflow Automation";
+    case "Workflow Automation": return "Skills Up";
+    case "QA Manual":
+      if (isSinProgramacion(a.q8)) return "Workflow Automation";
+      if (a.q8===2) return "QA Automatizado";
+      if (a.q8===3) return "Dev";
+      return "Workflow Automation";
+    case "QA Automatizado": return "QA AI";
+    case "QA AI": return "Dev";
+    case "Dev": return "QA Automatizado";
+    case "Accesibilidad": return "Sostenibilidad Digital";
+    case "Sostenibilidad Digital": return "Accesibilidad";
+    default: return null;
+  }
+}
+
+// ---------- ALTERNATIVAS CUANDO YA CURSÓ PROGRAMAS ----------
+// Lista ordenada de reemplazos para el programa principal. Se toma el primero
+// que la persona no haya cursado.
+function principalAlternatives(principal, a) {
+  const primero = exclusionReplacement(principal, a);
+  const extras = {
+    "NoCode": ["Skills Up"],
+    "Skills Up": [],
+    "Workflow Automation": [],
+    "QA Manual": ["Workflow Automation"],
+    "QA Automatizado": ["Workflow Automation"],
+    "QA AI": ["Workflow Automation"],
+    "Dev": ["QA AI"],
+    "Accesibilidad": [],
+    "Sostenibilidad Digital": [],
+    "Ciudadanía Conectada": []
+  }[principal] || [];
+  return [primero, ...extras].filter((p, i, arr) => p && arr.indexOf(p) === i);
+}
+
+// Opciones de siguiente paso para cada programa: primero la que sale de las
+// reglas de computeSecondaryFor, después estas en orden.
+const SECONDARY_ALTERNATIVES = {
+  "NoCode": ["Workflow Automation", "Skills Up"],
+  "Skills Up": ["Workflow Automation", "QA Manual"],
+  "Workflow Automation": ["Skills Up", "QA Manual"],
+  "QA Manual": ["Workflow Automation", "QA Automatizado"],
+  "QA Automatizado": ["QA AI", "Workflow Automation"],
+  "QA AI": ["Workflow Automation", "Dev"],
+  "Dev": ["QA Manual", "QA Automatizado"],
+  "Accesibilidad": ["Sostenibilidad Digital", "Skills Up", "Ciudadanía Conectada"],
+  "Sostenibilidad Digital": ["Accesibilidad", "Skills Up", "Ciudadanía Conectada"]
+};
+
+function pickSecondary(principal, a, excluidos) {
+  if (principal === "Ciudadanía Conectada") return null;
+  const base = computeSecondaryFor(principal, a);
+  if (!base) return null;
+  const opciones = [base.prog, ...(SECONDARY_ALTERNATIVES[principal] || [])]
+    .filter((p, i, arr) => arr.indexOf(p) === i);
+  const libre = opciones.find(p => p !== principal && !excluidos.includes(p));
+  // Si ya cursó todas las opciones, no se muestra siguiente paso.
+  return libre ? { prog: libre } : null;
+}
+
+function resolveTechnicalBranch() {
+  const a = answers;
+  let principal;
+  if (isSinProgramacion(a.q8)) principal = "QA Manual";
+  else if (isBasicoOFluido(a.q8)) {
+    if (a.q9===2) principal = "QA Automatizado";
+    else if (a.q9===3) principal = "QA AI";
+    else if (isSinTestingORef(a.q9)) {
+      if (a.q7===1) principal = "Dev";
+      else if (a.q7===0) principal = "QA Manual";
+      else principal = isFluido(a.q8) ? "Dev" : "QA Manual";
+    }
+  }
+  return principal;
+}
+
+function resolveProfundizar() {
+  const a = answers;
+  let principal;
+  if (isSinProgramacion(a.q8)) principal = "QA Manual";
+  else if (isBasicoOFluido(a.q8)) {
+    if (isSinTestingORef(a.q9)) principal = "Dev";
+    else if (a.q9===2) principal = (a.q10!==undefined && isTecnicoAvanzadoIA(a.q10)) ? "QA AI" : "QA Automatizado";
+    else if (a.q9===3) principal = "QA AI";
+  }
+  return principal;
+}
+
+function resolveAccesibilidadSost() {
+  const a = answers;
+  return isTestingManualOAuto(a.q9) ? "Accesibilidad" : "Sostenibilidad Digital";
+}
+
+// Tres familias de framing por Q1, según el tipo de objetivo elegido en Q6:
+// "aplicar" (mejorar/usar algo que ya hace), "salto" (cambiar de rubro hacia
+// IT, arrancando de más atrás) y "profundizar" (ya tiene una base técnica y
+// quiere especializarse) — para que la frase no suene desalineada con lo
+// que la persona realmente pidió.
+const APPLY_FRAMINGS = [
+  "Podés usarlo para mejorar tu desempeño en tu trabajo actual.",
+  "Podés aplicar esto a tu negocio o proyecto.",
+  "Podés sumar herramientas que te van a diferenciar cuando consigas tu próximo trabajo.",
+  "Podés aplicar esto a trabajos prácticos o proyectos de tus estudios, y llegar con ventaja al mercado laboral.",
+  "Podés sumar herramientas útiles para cuando retomes una actividad laboral."
+];
+const TECH_FRAMINGS = [
+  "Es un primer paso concreto para orientar tu carrera hacia el sector IT.",
+  "Podés compaginarlo con tu emprendimiento mientras avanzás en lo técnico.",
+  "Te va a dar una base concreta para el sector mientras seguís buscando trabajo.",
+  "Podés combinarlo con tus estudios actuales y sumar una salida laboral más.",
+  "Es un buen momento para dedicarte de lleno a dar este paso."
+];
+const DEEPEN_FRAMINGS = [
+  "Vas a sumar una especialización que te permite asumir tareas más complejas en tu trabajo.",
+  "Vas a sumar una especialización que podés convertir en nuevos servicios o mejoras para tu negocio.",
+  "Vas a llegar más preparado/a a las búsquedas, con una especialización más sólida.",
+  "Podés sumar esta especialización a tu formación actual.",
+  "Es un buen momento para especializarte y volver al mercado laboral más preparado/a."
+];
+
+// Accesibilidad / Sostenibilidad Digital (objetivo q6=5): frases con mirada social.
+const SOCIAL_FRAMINGS = [
+  "Podés incorporar una mirada más inclusiva y responsable en tu trabajo actual.",
+  "Podés sumar una mirada más inclusiva y responsable a tu negocio o proyecto.",
+  "Vas a sumar una mirada inclusiva y responsable que te diferencia en las búsquedas.",
+  "Podés incorporar una mirada inclusiva y responsable a tus estudios y proyectos.",
+  "Podés sumar una mirada inclusiva y responsable para cuando retomes una actividad laboral."
+];
+
+function objectiveType(a) {
+  if (a.q6 === 4) return "profundizar";
+  if (a.q6 === 3) return "salto";
+  if (a.q6 === 8) return a.bis === 0 ? "aplicar" : "salto";
+  return "aplicar";
+}
+
+function computeFraming(a, principal) {
+  // Objetivo "aplicar la tecnología a mi emprendimiento": siempre la frase de
+  // negocio/proyecto, sin importar la situación laboral de la pregunta 1.
+  if (a.q6 === 6) return APPLY_FRAMINGS[1];
+  // Si por programas ya cursados terminó en un programa no técnico, se usan
+  // las frases de "aplicar" aunque el objetivo fuera otro.
+  if (["Skills Up", "Workflow Automation", "NoCode"].includes(principal)) return APPLY_FRAMINGS[a.q1] || "";
+  if (a.q6 === 5) return SOCIAL_FRAMINGS[a.q1] || "";
+  const type = objectiveType(a);
+  if (type === "profundizar") return DEEPEN_FRAMINGS[a.q1] || "";
+  if (type === "salto") return TECH_FRAMINGS[a.q1] || "";
+  return APPLY_FRAMINGS[a.q1] || "";
+}
+
+function computeResult() {
+  const a = answers;
+  let principal;
+
+  if (a.q6===0 || a.q6===6) principal = "Skills Up";
+  else if (a.q6===1) principal = "Ciudadanía Conectada";
+  else if (a.q6===2) principal = "Workflow Automation";
+  else if (a.q6===7) principal = "NoCode";
+  else if (a.q6===8) {
+    if (a.bis===0) principal = "Skills Up";
+    else principal = resolveTechnicalBranch();
+  }
+  else if (a.q6===3) principal = resolveTechnicalBranch();
+  else if (a.q6===4) principal = resolveProfundizar();
+  else if (a.q6===5) principal = resolveAccesibilidadSost();
+
+  const excluidos = (hizoXAcademy(a.cap) && Array.isArray(a.capBis))
+    ? a.capBis.map(i => QUESTIONS.capBis.options[i]) : [];
+  let excludedNote = null;
+
+  if (excluidos.includes(principal)) {
+    const original = principal;
+    const libre = principalAlternatives(original, a).find(p => !excluidos.includes(p));
+    if (libre) {
+      // Hay una alternativa al programa principal que no cursó.
+      principal = libre;
+      excludedNote = `Ya cursaste "${original}" — te sugerimos "${principal}" en su lugar.`;
+    } else {
+      // Escalón 1: se agotaron las alternativas del principal → sube el siguiente paso.
+      const sube = pickSecondary(original, a, excluidos);
+      if (sube) {
+        principal = sube.prog; // sin nota: se muestra directamente el programa
+      } else {
+        // Escalón 2: no queda nada para recomendar con este objetivo.
+        return { agotado: true, original };
+      }
+    }
+  }
+
+  // Ciudadanía Conectada: sin "Para vos" ni siguiente paso sugerido.
+  const esCC = principal === "Ciudadanía Conectada";
+  const framing = esCC ? "" : computeFraming(a, principal);
+  const secondary = esCC ? null : pickSecondary(principal, a, excluidos);
+
+  return { principal, framing, secondary, excludedNote };
+}
+
+// ---------- REGISTRO DE RESPUESTAS (Apps Script) ----------
+// URL de la implementación del Apps Script (la que termina en /exec).
+// El script recibe cada resultado por doPost y lo agrega a la hoja "Respuestas".
+const API_URL = "https://script.google.com/macros/s/AKfycbzHSB6jZs4_8qJTu-qOv7i4FnXj7r7nkUQwtZ2w_HmKtbslOVvHvsu59PhAFQS1Fm6i/exec";
+const ASSESSMENT_VERSION = "2026-10-20";
+let resultadoGuardado = false;
+
+function textoRespuesta(qid) {
+  // Solo se guardan las preguntas del recorrido final: si la persona volvió
+  // atrás y cambió de camino, las respuestas descartadas no se registran.
+  if (!path.includes(qid)) return "";
+  const v = answers[qid];
+  if (v === undefined) return "";
+  const opts = QUESTIONS[qid].options;
+  if (Array.isArray(v)) return v.map(i => opts[i]).join(", ");
+  return opts[v];
+}
+
+function guardarRespuesta(r) {
+  if (resultadoGuardado) return;
+  resultadoGuardado = true;
+  const registro = {
+    q1: textoRespuesta("q1"), q2: textoRespuesta("q2"),
+    cap: textoRespuesta("cap"), capBis: textoRespuesta("capBis"),
+    q3: textoRespuesta("q3"), q4: textoRespuesta("q4"), q5: textoRespuesta("q5"),
+    q6: textoRespuesta("q6"), bis: textoRespuesta("bis"),
+    q7: textoRespuesta("q7"), q8: textoRespuesta("q8"),
+    q9: textoRespuesta("q9"), q10: textoRespuesta("q10"),
+    principal: r.principal || "",
+    secundario: r.secondary ? r.secondary.prog : "",
+    exclusion: r.excludedNote || "",
+    version: ASSESSMENT_VERSION
+  };
+  // Si no hay URL configurada, el assessment funciona igual y no guarda nada.
+  if (!API_URL || !API_URL.startsWith("https://")) return;
+  // text/plain + no-cors: evita el preflight de CORS que Apps Script no responde.
+  // keepalive: el envío se completa aunque la persona cierre la pestaña enseguida.
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    keepalive: true,
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(registro)
+  }).catch(err => console.error("No se pudo guardar la respuesta:", err));
+}
+
+// ---------- RENDER ----------
+function renderTrack() {
+  const total = path.length;
+  return `<div class="track">${Array.from({length: total}).map((_,i) =>
+    `<div class="track-seg${i < currentIndex ? ' done' : ''}"></div>`
+  ).join('')}</div>`;
+}
+
+function renderQuestion() {
+  const qid = path[currentIndex];
+  const q = QUESTIONS[qid];
+  const isMulti = q.type === "multi";
+  if (isMulti && !Array.isArray(answers[qid])) answers[qid] = [];
+
+  const optsHtml = q.options.map((opt,i) => {
+    const sel = isMulti ? answers[qid].includes(i) : answers[qid]===i;
+    return `<button class="opt${sel?' selected':''}" data-i="${i}">${opt}</button>`;
+  }).join('');
+
+  const enabled = isMulti ? answers[qid].length>0 : answers[qid]!==undefined;
+
+  document.getElementById('stage').innerHTML = `
+    ${renderTrack()}
+    <div class="question-num">${q.num}</div>
+    <h1 class="qtext">${q.text}</h1>
+    <div class="options">${optsHtml}</div>
+    <div class="nav-row">
+      <button class="btn" id="back" ${currentIndex===0?'disabled':''}>Atrás</button>
+      <button class="btn primary" id="next" ${enabled?'':'disabled'}>${currentIndex===path.length-1?'Ver resultado':'Siguiente'}</button>
+    </div>
+  `;
+
+  document.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.i);
+      if (isMulti) {
+        const arr = answers[qid];
+        const p = arr.indexOf(i);
+        if (p>=0) arr.splice(p,1); else arr.push(i);
+      } else {
+        answers[qid] = i;
+        extendPathAfter(qid);
+      }
+      renderQuestion();
+    });
+  });
+  document.getElementById('back').addEventListener('click', () => { if (currentIndex>0){currentIndex--; renderQuestion();} });
+  document.getElementById('next').addEventListener('click', () => {
+    if (currentIndex < path.length-1) { currentIndex++; renderQuestion(); }
+    else renderResult();
+  });
+}
+
+function cantidadCursados() {
+  return (hizoXAcademy(answers.cap) && Array.isArray(answers.capBis)) ? answers.capBis.length : 0;
+}
+
+// Quien hizo VOLUNTEER_MIN_PROGRAMS o más no recibe programa: se le muestra
+// solo la invitación a voluntariado.
+function renderVolunteer() {
+  guardarRespuesta({ principal: "Invitación a voluntariado", secondary: null, excludedNote: null });
+  const stage = document.getElementById('stage');
+  stage.classList.add('stage-wide');
+  stage.innerHTML = `
+    <div class="result">
+      <div class="result-eyebrow">Tu resultado</div>
+      <div class="result-name">¡Ya sos parte de la comunidad XAcademy!</div>
+      <div class="result-blurb" style="margin-top:14px;">Hiciste muchos de nuestros programas y tu experiencia puede ayudar a otras personas. Si querés involucrarte de otra manera, te invitamos a sumarte como voluntario/a.</div>
+      <a class="signup-btn" href="mailto:${VOLUNTEER_EMAIL}">Quiero ser voluntario/a</a>
+      <div class="volunteer-mail">O escribinos a <a href="mailto:${VOLUNTEER_EMAIL}">${VOLUNTEER_EMAIL}</a></div>
+      <button class="restart" id="restart">Volver a empezar</button>
+      <div class="privacy-note">Tus respuestas se guardan de forma anónima y solo se usan para mejorar nuestros programas.</div>
+    </div>`;
+  document.getElementById('restart').addEventListener('click', () => {
+    answers = {}; path = ["q1","q2","cap","q3","q4","q5","q6"]; currentIndex = 0;
+    resultadoGuardado = false;
+    stage.classList.remove('stage-wide');
+    renderQuestion();
+  });
+}
+
+// Ya cursó todo lo que se recomienda para el objetivo elegido.
+function renderExhausted() {
+  guardarRespuesta({ principal: "Sin recomendación (ya cursó todo para este objetivo)", secondary: null, excludedNote: null });
+  const stage = document.getElementById('stage');
+  stage.classList.add('stage-wide');
+  stage.innerHTML = `
+    <div class="result">
+      <div class="result-eyebrow">Tu resultado</div>
+      <div class="result-name">¿Te interesa explorar otra área?</div>
+      <div class="result-blurb" style="margin-top:14px;">Ya hiciste todos los programas que te recomendaríamos para este objetivo. Podés volver a empezar y elegir otro objetivo para descubrir otros programas de XAcademy.</div>
+      <button class="signup-btn" id="restart" style="border:none;cursor:pointer;font-family:inherit;">Volver a empezar</button>
+      <div class="privacy-note" style="text-align:left;">Tus respuestas se guardan de forma anónima y solo se usan para mejorar nuestros programas.</div>
+    </div>`;
+  document.getElementById('restart').addEventListener('click', () => {
+    answers = {}; path = ["q1","q2","cap","q3","q4","q5","q6"]; currentIndex = 0;
+    resultadoGuardado = false;
+    stage.classList.remove('stage-wide');
+    renderQuestion();
+  });
+}
+
+function renderResult() {
+  if (cantidadCursados() >= VOLUNTEER_MIN_PROGRAMS) { renderVolunteer(); return; }
+  const r = computeResult();
+  if (r.agotado) { renderExhausted(); return; }
+  guardarRespuesta(r);
+  const info = PROGRAMS[r.principal] || { duration:"", blurb:"No se pudo determinar un programa con estas respuestas." };
+
+  const framingHtml = r.framing ? `<div style="margin-bottom:22px;color:var(--text-muted);font-style:italic;">${r.framing}</div>` : "";
+  const noteHtml = r.excludedNote ? `<div class="flag-note">${r.excludedNote}</div>` : "";
+  const secHtml = r.secondary ? `
+    <div class="next-step">
+      <div class="next-step-label">Siguiente paso sugerido</div>
+      <div class="next-step-name">${r.secondary.prog}</div>
+      <div class="next-step-why">Una vez que termines (o estés por terminar) ${r.principal}, te sugerimos sumar ${r.secondary.prog} como siguiente paso. ${secondaryDisplayText(r.secondary.prog, answers)}</div>
+    </div>` : "";
+
+  const signupUrl = SIGNUP_URLS[r.principal];
+  const signupNote = SIGNUP_NOTES[r.principal];
+  const signupHtml = signupUrl
+    ? `<a class="signup-btn" href="${signupUrl}" target="_blank" rel="noopener">Inscribite</a>`
+    : signupNote ? `<div class="signup-note">${signupNote}</div>` : "";
+
+  const workshopsHtml = r.principal === "Ciudadanía Conectada" ? `
+    <div class="cc-label">Los 5 talleres del programa</div>
+    <div class="cc-grid">
+      ${CC_WORKSHOPS.map(w => `
+        <div class="cc-card">
+          <div class="cc-name">${w.name}</div>
+          <div class="cc-who">${w.who}</div>
+          <div class="cc-desc">${w.desc}</div>
+          <div class="cc-meta">${w.meta}</div>
+        </div>`).join('')}
+    </div>
+    <div class="cc-contact">
+      <div class="cc-contact-title">¿Querés saber más?</div>
+      <div class="cc-contact-text">Si te interesa participar o llevar alguno de estos talleres a tu colegio, institución o comunidad, comunicate con el equipo de Technology With Purpose.</div>
+      ${CC_CONTACT_URL ? `<a class="cc-contact-btn" href="${CC_CONTACT_URL}" target="_blank" rel="noopener">${CC_CONTACT_LABEL}</a>` : ""}
+    </div>` : "";
+
+  // Todos los resultados usan un ancho mayor que las preguntas, en una sola columna.
+  document.getElementById('stage').classList.add('stage-wide');
+  document.getElementById('stage').innerHTML = `
+    <div class="result">
+      <div>
+        <div class="result-main">
+          <div class="result-eyebrow">Tu programa recomendado</div>
+          <div class="result-name">${r.principal}</div>
+          <div class="result-meta">${info.duration}</div>
+          ${r.framing ? `<div class="framing-card"><span class="framing-label">Para vos</span>${r.framing}</div>` : ""}
+          <div class="result-blurb">${info.blurb}</div>
+          ${signupHtml}
+          ${workshopsHtml}
+          ${noteHtml}
+        </div>
+        ${secHtml ? `<div class="result-side">${secHtml}</div>` : ""}
+      </div>
+      <button class="restart" id="restart">Volver a empezar</button>
+      <div class="privacy-note">Tus respuestas se guardan de forma anónima y solo se usan para mejorar nuestros programas.</div>
+    </div>
+  `;
+  document.getElementById('restart').addEventListener('click', () => {
+    answers = {}; path = ["q1","q2","cap","q3","q4","q5","q6"]; currentIndex = 0;
+    resultadoGuardado = false;
+    document.getElementById('stage').classList.remove('stage-wide');
+    renderQuestion();
+  });
+}
+
+renderFooter();
+renderQuestion();
+</script>
+</body>
+</html>
