@@ -415,6 +415,44 @@
   }
 </style>
 
+<style id="ficha-programa">
+  .result-modalidad { margin: -4px 0 14px; font-size: 0.95rem; color: var(--text-muted); line-height: 1.45; }
+  .ficha {
+    margin: -10px 0 26px; border: 1px solid var(--border); border-radius: 14px;
+    background: var(--surface); overflow: hidden;
+  }
+  .ficha summary {
+    cursor: pointer; list-style: none; padding: 14px 18px;
+    font-weight: 600; font-size: 1rem; color: var(--accent-2);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .ficha summary::-webkit-details-marker { display: none; }
+  .ficha summary::after { content: "+"; font-size: 1.3rem; font-weight: 500; line-height: 1; color: var(--accent); }
+  .ficha[open] summary::after { content: "−"; }
+  .ficha summary:hover { background: var(--surface-2); }
+  .ficha summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .ficha-body { margin: 0; padding: 4px 18px 16px; border-top: 1px solid var(--border); }
+  .ficha-row { display: grid; grid-template-columns: 150px 1fr; gap: 6px 18px; padding: 12px 0; border-bottom: 1px solid #eee; }
+  .ficha-row:last-child { border-bottom: none; }
+  .ficha-row dt { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+  .ficha-row dd { margin: 0; font-size: 0.97rem; line-height: 1.5; color: var(--text); }
+  .ficha-list { margin: 0; padding-left: 18px; }
+  .ficha-list li { margin: 2px 0; }
+  .ficha-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .ficha-chip { font-size: 0.85rem; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: #5a1a99; }
+  .ficha-group { font-size: 0.8rem; font-weight: 600; color: var(--accent-2); margin: 8px 0 5px; }
+  .ficha-group:first-child { margin-top: 0; }
+  .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin: -8px 0 30px; }
+  .cta-row .signup-btn { margin: 0; }
+  .cc-contact-btn { max-width: 100%; overflow-wrap: anywhere; }
+  .landing-btn { font-weight: 600; color: var(--accent); text-decoration: none; font-size: 1rem; }
+  .landing-btn:hover { text-decoration: underline; }
+  @media (max-width: 560px) {
+    .ficha-row { grid-template-columns: 1fr; gap: 4px; }
+    .cta-row .signup-btn { width: 100%; }
+  }
+</style>
+
 <style id="objetivos-multiseleccion">
   .qhint { margin: -18px 0 18px; font-size: 0.95rem; color: var(--text-muted); }
   .qhint .qcount { margin-left: 6px; font-weight: 600; color: var(--accent-2); }
@@ -439,7 +477,7 @@ const PROGRAMS = {
   "Ciudadanía Conectada": {
     duration: "5 talleres presenciales",
     audience: "Pensado para cualquier persona, sea cual sea su nivel tecnológico, que quiera cuidarse o cuidar a otros en el mundo digital.",
-    blurb: "Es un programa de talleres para moverte con más seguridad, confianza y autonomía en el mundo digital, y también para acompañar a otros: prevención de estafas, inteligencia artificial, cuidado de adolescentes, convivencia en redes y trámites digitales. Elegí el taller que mejor se ajuste a vos o a las personas con las que trabajás."
+    blurb: "Es un programa de talleres para moverte con más seguridad, confianza y autonomía en el mundo digital, y también para acompañar a otros: prevención de estafas, inteligencia artificial, cuidado de adolescentes, convivencia en redes y trámites digitales."
   },
   "NoCode": {
     duration: "3 semanas · 3 clases sincrónicas y prácticas",
@@ -472,12 +510,12 @@ const PROGRAMS = {
     blurb: "Vas a consolidar tu perfil como desarrollador/a: formación técnica, experiencia práctica y cultura de trabajo IT, pensado para quien ya tiene una base de programación y busca proyectarse en la industria."
   },
   "Accesibilidad": {
-    duration: "Virtual",
+    duration: "Virtual · Masterclass",
     audience: "Pensado para quienes ya tienen conocimientos básicos de testing o QA manual y quieren sumar la perspectiva de accesibilidad.",
     blurb: "Vas a aprender a integrar accesibilidad digital en proyectos y productos: testing exploratorio, criterios WCAG y el rol del tester de accesibilidad, partiendo de una base de testing o QA manual."
   },
   "Sostenibilidad Digital": {
-    duration: "Virtual",
+    duration: "3 semanas · virtual sincrónico vía Meet",
     audience: "Pensado para perfiles técnicos o de comunicación que quieran sumar una mirada sostenible a su trabajo.",
     blurb: "Vas a integrar criterios de desarrollo sostenible en proyectos digitales: green software, diseño UX/UI accesible y comunicación climática con storytelling de datos."
   }
@@ -488,7 +526,7 @@ const PROGRAMS = {
 // Mientras un link esté vacío, el botón "Inscribite" no aparece para ese programa.
 // Ciudadanía Conectada no lleva botón (tiene el bloque de contacto).
 const SIGNUP_URLS = {
-  "Skills Up": "https://docs.google.com/forms/d/e/1FAIpQLSei1vUjS7lfRdNwiZXg5IlPmSZ4IQhXPuHc9_zu3Gyzb7k_LQ/viewform",
+  "Skills Up": "https://forms.gle/UECto4f94dgwf31G8",
   "NoCode": "https://bit.ly/XAcademyNoCode",
   "Workflow Automation": "https://bit.ly/XAcademyWA2026",
   "QA Manual": "https://bit.ly/XAcademyQAM2026",
@@ -504,6 +542,156 @@ const SIGNUP_URLS = {
 const SIGNUP_NOTES = {
   "Accesibilidad": "Por el momento no hay inscripciones abiertas para este programa. Quedate atento/a a la próxima edición."
 };
+
+// ---------- FICHAS DE PROGRAMA ----------
+// Fuente: planilla "Fichas programas XAcademy" (pestaña Fichas).
+// Se muestran en el resultado: la modalidad en el encabezado y el resto en el
+// desplegable "Conocé el programa". Los campos vacíos no se muestran.
+// - herramientas: lista simple, o grupos { grupo, items } (ver Dev).
+// - landing: link a la sección del programa en la landing. Cuando se cargue,
+//   aparece el botón "Ver programa completo".
+const CERT_XACADEMY = "Certificado digital al completar el programa, avalado por la Fundación, Santex y la Secretaría de Ciencia y Tecnología de la Provincia de Córdoba.";
+
+const FICHAS = {
+  "Skills Up": {
+    modalidad: "Virtual, asincrónica y autodirigida en Aula Virtual",
+    carga: "2 h / semana",
+    requisitos: ["Computadora con conexión a internet, sin requisitos técnicos"],
+    temas: ["Herramientas digitales para la organización", "Estrategia comercial", "Productividad"],
+    herramientas: ["Google Workspace", "Cualquier chat de IA"],
+    certificacion: CERT_XACADEMY,
+    cohorte: "Verano 2027",
+    landing: ""
+  },
+  "Ciudadanía Conectada": {
+    modalidad: "Presencial (talleres sueltos)",
+    carga: "Según el taller (presencial)",
+    requisitos: ["Sin requisitos"],
+    temas: [], // los talleres ya se muestran como tarjetas
+    herramientas: [],
+    certificacion: CERT_XACADEMY,
+    cohorte: "",
+    landing: ""
+  },
+  "NoCode": {
+    modalidad: "Virtual sincrónica vía Meet + Aula Virtual asincrónica",
+    carga: "3 h / semana",
+    requisitos: ["Computadora con conexión a internet"],
+    temas: ["Generación de aplicaciones con IA en Google AI Studio", "Conexión con documentos de Drive e imágenes", "Bases de datos en la nube con Firebase y Firestore"],
+    herramientas: ["Google AI Studio", "Gemini", "Firebase (Firestore)", "Google Drive"],
+    certificacion: CERT_XACADEMY,
+    cohorte: "1er semestre 2027",
+    landing: ""
+  },
+  "Workflow Automation": {
+    modalidad: "Virtual sincrónica vía Meet + Aula Virtual asincrónica",
+    carga: "6 h / semana",
+    requisitos: ["Sin experiencia previa en programación", "Computadora con conexión a internet"],
+    temas: ["Diseño e implementación de automatizaciones de flujos", "Integración de aplicaciones", "Optimización de procesos"],
+    herramientas: ["N8N"],
+    certificacion: CERT_XACADEMY,
+    cohorte: "1er semestre 2027",
+    landing: ""
+  },
+  "QA Manual": {
+    modalidad: "Virtual asincrónica en Aula Virtual, con tutorías sincrónicas de acompañamiento las tres últimas semanas",
+    carga: "4 h / semana",
+    requisitos: ["Sin experiencia previa", "Computadora con conexión a internet"],
+    temas: ["Fundamentos de testing", "Metodologías ágiles", "Prácticas aplicadas"],
+    herramientas: ["Trello o Jira", "Google Workspace"],
+    certificacion: CERT_XACADEMY,
+    cohorte: "Febrero 2027",
+    landing: ""
+  },
+  "QA Automatizado": {
+    modalidad: "Virtual sincrónica vía Meet + Aula Virtual asincrónica",
+    carga: "5 h / semana",
+    requisitos: ["Conocimientos previos de testing manual", "Computadora con conexión a internet"],
+    temas: ["Diseño, desarrollo y ejecución de pruebas automatizadas", "Buenas prácticas de programación y testing"],
+    herramientas: ["Cypress", "Postman", "GitHub", "Trello"],
+    certificacion: CERT_XACADEMY,
+    cohorte: "1er semestre 2027",
+    landing: ""
+  },
+  "QA AI": {
+    modalidad: "Virtual sincrónica vía Meet + Aula Virtual asincrónica",
+    carga: "6 h / semana",
+    requisitos: ["Experiencia previa en testing manual", "Computadora con conexión a internet"],
+    temas: ["Criterios y herramientas para testear agentes y soluciones basadas en IA"],
+    herramientas: [],
+    certificacion: CERT_XACADEMY,
+    cohorte: "2do semestre 2027",
+    landing: ""
+  },
+  "Dev": {
+    modalidad: "Virtual asincrónica en Aula Virtual, con clases sincrónicas de refuerzo y mentoría sincrónica grupal las últimas 4 semanas",
+    carga: "6 h / semana",
+    requisitos: ["Conocimientos previos en programación", "Computadora con conexión a internet"],
+    temas: ["Formación técnica en desarrollo", "Cultura de trabajo IT", "Análisis de negocios", "Dinámica colaborativa"],
+    herramientas: [
+      { grupo: "Lenguajes y tecnologías web", items: ["HTML5", "CSS3", "JavaScript (ES6+)", "TypeScript"] },
+      { grupo: "Frameworks y librerías", items: ["Bootstrap", "Angular", "RxJS", "Express"] },
+      { grupo: "Backend y datos", items: ["Node.js", "Sequelize (ORM)", "Axios", "MySQL"] },
+      { grupo: "Autenticación", items: ["JWT", "Passport"] },
+      { grupo: "Entorno y control de versiones", items: ["Linux / Ubuntu", "Visual Studio Code", "Git y GitHub", "Docker"] },
+      { grupo: "Testing / QA", items: ["Postman"] },
+      { grupo: "Gestión ágil", items: ["Jira", "Trello"] },
+      { grupo: "Comunicación y colaboración", items: ["Google Meet", "Slack", "Notion"] }
+    ],
+    certificacion: CERT_XACADEMY,
+    cohorte: "Febrero 2027",
+    landing: ""
+  },
+  "Accesibilidad": {
+    modalidad: "Virtual sincrónica vía Meet + Aula Virtual asincrónica",
+    carga: "2 h / semana",
+    requisitos: ["Conocimientos básicos en testing o QA manual", "Computadora con conexión a internet"],
+    temas: ["Fundamentos de testing aplicados a accesibilidad", "Tipos de pruebas y testeo exploratorio", "Criterios WCAG y marco normativo", "Rol y habilidades del tester de accesibilidad"],
+    herramientas: [],
+    certificacion: CERT_XACADEMY,
+    cohorte: "1er semestre 2027",
+    landing: ""
+  },
+  "Sostenibilidad Digital": {
+    modalidad: "Virtual sincrónica vía Meet + Aula Virtual asincrónica",
+    carga: "5 h / semana",
+    requisitos: ["Experiencia en tecnología o comunicación digital", "Computadora con conexión a internet"],
+    temas: ["Desarrollo sostenible (green software)", "Diseño UX/UI accesible (WSG, Humanity-Centered Design)", "Comunicación climática (storytelling con datos)"],
+    herramientas: [],
+    certificacion: CERT_XACADEMY,
+    cohorte: "1er semestre 2027",
+    landing: ""
+  }
+};
+
+function renderFicha(prog) {
+  const f = FICHAS[prog];
+  if (!f) return "";
+  const lista = arr => `<ul class="ficha-list">${arr.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  const chips = arr => `<div class="ficha-chips">${arr.map(x => `<span class="ficha-chip">${x}</span>`).join('')}</div>`;
+  let herr = "";
+  if (f.herramientas && f.herramientas.length) {
+    herr = typeof f.herramientas[0] === "string"
+      ? chips(f.herramientas)
+      : f.herramientas.map(g => `<div class="ficha-group">${g.grupo}</div>${chips(g.items)}`).join('');
+  }
+  const filas = [
+    ["Carga horaria", f.carga],
+    ["Próxima cohorte", f.cohorte],
+    ["Requisitos", f.requisitos && f.requisitos.length ? lista(f.requisitos) : ""],
+    ["Temas", f.temas && f.temas.length ? lista(f.temas) : ""],
+    ["Herramientas", herr],
+    ["Certificación", f.certificacion]
+  ].filter(([, v]) => v);
+  if (!filas.length) return "";
+  return `
+    <details class="ficha">
+      <summary>Conocé el programa</summary>
+      <dl class="ficha-body">
+        ${filas.map(([k, v]) => `<div class="ficha-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
+      </dl>
+    </details>`;
+}
 
 // ---------- REDES INSTITUCIONALES (pie de página) ----------
 // Pegar cada link entre las comillas. Los que estén vacíos no se muestran.
@@ -555,8 +743,8 @@ const CC_WORKSHOPS = [
 
 // Contacto para que el equipo oriente sobre los talleres. Si se completa
 // (mail como "mailto:..." o un link de WhatsApp/formulario), aparece un botón.
-const CC_CONTACT_URL = "";
-const CC_CONTACT_LABEL = "Contactar al equipo";
+const CC_CONTACT_URL = "mailto:francisco.muzzio@technologywithpurpose.org";
+const CC_CONTACT_LABEL = "Escribinos a francisco.muzzio@technologywithpurpose.org";
 
 // ---------- PREGUNTAS ----------
 // Q6 (objetivo) es de selección múltiple: hasta OBJ_MAX opciones.
@@ -1011,7 +1199,7 @@ function computeResult() {
 // URL de la implementación del Apps Script (la que termina en /exec).
 // El script recibe cada resultado por doPost y lo agrega a la hoja "Respuestas".
 const API_URL = "https://script.google.com/macros/s/AKfycbzHSB6jZs4_8qJTu-qOv7i4FnXj7r7nkUQwtZ2w_HmKtbslOVvHvsu59PhAFQS1Fm6i/exec";
-const ASSESSMENT_VERSION = "2026-10-21-multiobjetivo";
+const ASSESSMENT_VERSION = "2026-11-05-fichas";
 let resultadoGuardado = false;
 
 function textoRespuesta(qid) {
@@ -1210,9 +1398,13 @@ function renderResult() {
 
   const signupUrl = SIGNUP_URLS[r.principal];
   const signupNote = SIGNUP_NOTES[r.principal];
+  const ficha = FICHAS[r.principal];
+  const landingHtml = ficha && ficha.landing
+    ? `<a class="landing-btn" href="${ficha.landing}" target="_blank" rel="noopener">Ver programa completo</a>` : "";
   const signupHtml = signupUrl
-    ? `<a class="signup-btn" href="${signupUrl}" target="_blank" rel="noopener">Inscribite</a>`
-    : signupNote ? `<div class="signup-note">${signupNote}</div>` : "";
+    ? `<div class="cta-row"><a class="signup-btn" href="${signupUrl}" target="_blank" rel="noopener">Inscribite</a>${landingHtml}</div>`
+    : signupNote ? `<div class="signup-note">${signupNote}</div>${landingHtml ? `<div class="cta-row">${landingHtml}</div>` : ""}`
+    : landingHtml ? `<div class="cta-row">${landingHtml}</div>` : "";
 
   const workshopsHtml = r.principal === "Ciudadanía Conectada" ? `
     <div class="cc-label">Los 5 talleres del programa</div>
@@ -1240,8 +1432,10 @@ function renderResult() {
           <div class="result-eyebrow">Tu programa recomendado</div>
           <div class="result-name">${r.principal}</div>
           <div class="result-meta">${info.duration}</div>
+          ${ficha && ficha.modalidad ? `<div class="result-modalidad">${ficha.modalidad}</div>` : ""}
           ${r.framing ? `<div class="framing-card"><span class="framing-label">Para vos</span>${r.framing}</div>` : ""}
           <div class="result-blurb">${info.blurb}</div>
+          ${renderFicha(r.principal)}
           ${signupHtml}
           ${workshopsHtml}
           ${noteHtml}
