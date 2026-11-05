@@ -453,6 +453,33 @@
   }
 </style>
 
+<style id="correo-novedades">
+  .novedades {
+    margin: 28px 0 0; padding: 20px 22px; border-radius: 16px;
+    border: 1px solid var(--border); background: var(--surface); text-align: left;
+  }
+  .novedades-title { font-weight: 700; font-size: 1.08rem; color: var(--text); margin-bottom: 4px; }
+  .novedades-text { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+  .novedades-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .novedades-row input[type=email] {
+    flex: 1 1 240px; min-width: 0; padding: 12px 16px; border-radius: 999px;
+    border: 1px solid var(--border); font: inherit; font-size: 1rem; color: var(--text); background: #fff;
+  }
+  .novedades-row input[type=email]:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .novedades-btn {
+    padding: 12px 26px; border-radius: 999px; border: none; cursor: pointer;
+    background: var(--accent-2); color: #fff; font: inherit; font-weight: 600; font-size: 1rem;
+  }
+  .novedades-btn:hover { background: var(--accent); }
+  .novedades-msg { font-size: 0.95rem; margin-top: 10px; }
+  .novedades-msg:empty { display: none; }
+  .novedades-msg.error { color: #b42318; }
+  .novedades-msg.ok { color: var(--accent-2); font-weight: 600; margin-top: 0; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+  @media (max-width: 480px) { .novedades-btn { width: 100%; } }
+</style>
+
 <style id="objetivos-multiseleccion">
   .qhint { margin: -18px 0 18px; font-size: 0.95rem; color: var(--text-muted); }
   .qhint .qcount { margin-left: 6px; font-weight: 600; color: var(--accent-2); }
@@ -1265,6 +1292,53 @@ function guardarRespuesta(r) {
   }).catch(err => console.error("No se pudo guardar la respuesta:", err));
 }
 
+// ---------- CORREO PARA NOVEDADES (opcional) ----------
+// Se guarda en la hoja "Contactos", separado de las respuestas (que siguen anónimas).
+const PRIVACY_NOTE = "Tus respuestas se guardan de forma anónima y solo se usan para mejorar nuestros programas. Si dejás tu correo, lo guardamos por separado y solo lo usamos para avisarte de inscripciones.";
+
+function novedadesHtml() {
+  return `
+    <form class="novedades" id="novedades" novalidate>
+      <div class="novedades-title">¿Querés que te avisemos cuando abran las inscripciones?</div>
+      <div class="novedades-text">Dejanos tu correo (es opcional) y te escribimos con las novedades de XAcademy.</div>
+      <div class="novedades-row">
+        <label class="sr-only" for="novedades-email">Tu correo</label>
+        <input type="email" id="novedades-email" name="email" placeholder="tucorreo@ejemplo.com" autocomplete="email" inputmode="email" maxlength="254" required>
+        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit" class="novedades-btn">Avisame</button>
+      </div>
+      <div class="novedades-msg" id="novedades-msg" role="status" aria-live="polite"></div>
+    </form>`;
+}
+
+function activarNovedades(programa) {
+  const form = document.getElementById('novedades');
+  if (!form) return;
+  form.addEventListener('submit', ev => {
+    ev.preventDefault();
+    const input = form.querySelector('#novedades-email');
+    const msg = form.querySelector('#novedades-msg');
+    const email = input.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      msg.textContent = "Revisá el correo: parece que falta algo.";
+      msg.className = "novedades-msg error";
+      input.focus();
+      return;
+    }
+    if (API_URL && API_URL.startsWith("https://")) {
+      fetch(API_URL, {
+        method: "POST", mode: "no-cors", keepalive: true,
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ tipo: "contacto", email, programa: programa || "", origen: "Assessment", website: form.website.value })
+      }).catch(err => console.error("No se pudo guardar el correo:", err));
+    }
+    form.querySelector('.novedades-row').remove();
+    form.querySelector('.novedades-text').remove();
+    msg.textContent = `¡Listo! Te vamos a escribir a ${email} cuando abran las inscripciones.`;
+    msg.className = "novedades-msg ok";
+  });
+}
+
 // ---------- RENDER ----------
 function renderTrack() {
   const total = path.length;
@@ -1366,7 +1440,7 @@ function renderVolunteer() {
       <a class="signup-btn" href="mailto:${VOLUNTEER_EMAIL}">Quiero ser voluntario/a</a>
       <div class="volunteer-mail">O escribinos a <a href="mailto:${VOLUNTEER_EMAIL}">${VOLUNTEER_EMAIL}</a></div>
       <button class="restart" id="restart">Volver a empezar</button>
-      <div class="privacy-note">Tus respuestas se guardan de forma anónima y solo se usan para mejorar nuestros programas.</div>
+      <div class="privacy-note">${PRIVACY_NOTE}</div>
     </div>`;
   document.getElementById('restart').addEventListener('click', () => {
     answers = {}; path = ["q1","q2","cap","q3","q4","q5","q6"]; currentIndex = 0;
@@ -1387,8 +1461,10 @@ function renderExhausted() {
       <div class="result-name">¿Te interesa explorar otra área?</div>
       <div class="result-blurb" style="margin-top:14px;">Ya hiciste todos los programas que te recomendaríamos para este objetivo. Podés volver a empezar y elegir otro objetivo para descubrir otros programas de XAcademy.</div>
       <button class="signup-btn" id="restart" style="border:none;cursor:pointer;font-family:inherit;">Volver a empezar</button>
-      <div class="privacy-note" style="text-align:left;">Tus respuestas se guardan de forma anónima y solo se usan para mejorar nuestros programas.</div>
+      ${novedadesHtml()}
+      <div class="privacy-note" style="text-align:left;">${PRIVACY_NOTE}</div>
     </div>`;
+  activarNovedades("Sin recomendación");
   document.getElementById('restart').addEventListener('click', () => {
     answers = {}; path = ["q1","q2","cap","q3","q4","q5","q6"]; currentIndex = 0;
     resultadoGuardado = false;
@@ -1462,10 +1538,12 @@ function renderResult() {
         </div>
         ${secHtml ? `<div class="result-side">${secHtml}</div>` : ""}
       </div>
+      ${novedadesHtml()}
       <button class="restart" id="restart">Volver a empezar</button>
-      <div class="privacy-note">Tus respuestas se guardan de forma anónima y solo se usan para mejorar nuestros programas.</div>
+      <div class="privacy-note">${PRIVACY_NOTE}</div>
     </div>
   `;
+  activarNovedades(r.principal);
   document.getElementById('restart').addEventListener('click', () => {
     answers = {}; path = ["q1","q2","cap","q3","q4","q5","q6"]; currentIndex = 0;
     resultadoGuardado = false;

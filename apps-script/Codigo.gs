@@ -1,6 +1,8 @@
 /**
  * Assessment "¿Por dónde empezar?" — Technology With Purpose / XAcademy
  * Backend del assessment: recibe cada resultado y lo guarda en la hoja "Respuestas".
+ * Si la persona deja su correo para novedades, se guarda aparte en la hoja
+ * "Contactos" (sin vincularlo a sus respuestas, que siguen siendo anónimas).
  *
  * La página pública vive en Vercel (repo assessment-xacademy) y manda cada resultado
  * por POST a la URL /exec de este script. doGet sigue sirviendo la versión anterior
@@ -12,6 +14,10 @@
 
 const NOMBRE_HOJA = 'Respuestas';
 const MAX_LARGO_CAMPO = 1000; // corta textos absurdamente largos
+
+const NOMBRE_HOJA_CONTACTOS = 'Contactos';
+const COLUMNAS_CONTACTOS = ['Fecha y hora', 'Correo', 'Programa recomendado', 'Origen'];
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // Orden de las columnas: [clave que manda el assessment, encabezado en la planilla]
 const COLUMNAS = [
@@ -43,10 +49,17 @@ function doGet() {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
-/** Lo llama la página de Vercel al mostrar el resultado (POST con el registro en JSON). */
+/**
+ * Lo llama la página de Vercel (POST con JSON):
+ * - al mostrar el resultado → fila en "Respuestas";
+ * - si la persona deja su correo ({ tipo: 'contacto', ... }) → fila en "Contactos".
+ */
 function doPost(e) {
   try {
     const registro = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    if (registro.tipo === 'contacto') {
+      return respuestaJson_(guardarContacto(registro));
+    }
     guardarRespuesta(registro);
     return respuestaJson_({ ok: true });
   } catch (err) {
@@ -72,6 +85,42 @@ function guardarRespuesta(registro) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/**
+ * Guarda un correo para novedades de inscripción. No duplica: si el correo ya
+ * está en la hoja, no agrega otra fila.
+ */
+function guardarContacto(datos) {
+  if (datos.website) return { ok: true }; // campo trampa: lo completan solo los bots
+  const email = String(datos.email || '').trim().toLowerCase();
+  if (email.length > 254 || !EMAIL_RE.test(email)) return { ok: false, error: 'email inválido' };
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const hoja = obtenerHojaContactos_();
+    const n = hoja.getLastRow() - 1;
+    if (n > 0) {
+      const existentes = hoja.getRange(2, 2, n, 1).getValues().map(r => String(r[0]).trim().toLowerCase());
+      if (existentes.indexOf(email) !== -1) return { ok: true, duplicado: true };
+    }
+    hoja.appendRow([new Date(), limpiar_(email), limpiar_(datos.programa), limpiar_(datos.origen || 'Assessment')]);
+    return { ok: true };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function obtenerHojaContactos_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let hoja = ss.getSheetByName(NOMBRE_HOJA_CONTACTOS);
+  if (!hoja) hoja = ss.insertSheet(NOMBRE_HOJA_CONTACTOS);
+  if (hoja.getLastRow() === 0) {
+    hoja.appendRow(COLUMNAS_CONTACTOS);
+    hoja.getRange(1, 1, 1, COLUMNAS_CONTACTOS.length).setFontWeight('bold').setBackground('#f1edfd');
+    hoja.setFrozenRows(1);
+  }
+  return hoja;
 }
 
 /**
@@ -109,5 +158,11 @@ function probarGuardado() {
 /** Para probar el doPost desde el editor, simulando lo que manda Vercel. */
 function probarDoPost() {
   const r = doPost({ postData: { contents: JSON.stringify({ q1: 'PRUEBA doPost', principal: 'QA Manual', version: 'prueba' }) } });
+  console.log(r.getContent());
+}
+
+/** Para probar el guardado de correos desde el editor. */
+function probarContacto() {
+  const r = doPost({ postData: { contents: JSON.stringify({ tipo: 'contacto', email: 'prueba@ejemplo.com', programa: 'QA Manual', origen: 'prueba' }) } });
   console.log(r.getContent());
 }
