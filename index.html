@@ -1016,6 +1016,27 @@ function principalAlternatives(principal, a) {
 
 // Opciones de siguiente paso para cada programa: primero la que sale de las
 // reglas de computeSecondaryFor, después estas en orden.
+// Nombre que ve la persona. La clave interna (la que se guarda en la planilla
+// de respuestas) no cambia, para no romper el historial.
+const DISPLAY_NAMES = { "Accesibilidad": "Accesibilidad Digital" };
+function nombre(p) { return DISPLAY_NAMES[p] || p; }
+
+// Sugerencia de programa posterior, de la planilla "Fichas programas XAcademy".
+// Se toma la primera que la persona no haya cursado; si cursó todas, siguen
+// las de SECONDARY_ALTERNATIVES.
+const SUGERENCIA_POSTERIOR = {
+  "Skills Up": ["Workflow Automation"],
+  "NoCode": ["Workflow Automation"],
+  "Workflow Automation": ["Dev"],
+  "QA Manual": ["QA Automatizado"],
+  "QA Automatizado": ["QA AI"],
+  "QA AI": ["Accesibilidad"],
+  "Dev": ["Accesibilidad", "QA Automatizado"],
+  "Accesibilidad": ["Sostenibilidad Digital", "Skills Up"],
+  "Sostenibilidad Digital": ["Accesibilidad", "Skills Up"]
+  // Ciudadanía Conectada no muestra siguiente paso (la planilla sugiere Skills Up).
+};
+
 const SECONDARY_ALTERNATIVES = {
   "NoCode": ["Workflow Automation", "Skills Up"],
   "Skills Up": ["Workflow Automation", "QA Manual"],
@@ -1051,10 +1072,9 @@ function pickSecondary(principal, a, excluidos) {
     .map(o => programaDeObjetivo(o, a))
     .filter(p => p && p !== principal && !excluidos.includes(p));
   if (declarados.length) return { prog: declarados[0], declarado: true };
-  // 2) Si no, las reglas de siempre.
-  const base = computeSecondaryFor(principal, a);
-  if (!base) return null;
-  const opciones = [base.prog, ...(SECONDARY_ALTERNATIVES[principal] || [])]
+  // 2) Si no, la sugerencia de la planilla y después las alternativas.
+  //    (computeSecondaryFor, las reglas por perfil, quedó sin uso desde 2026-11-05.)
+  const opciones = [...(SUGERENCIA_POSTERIOR[principal] || []), ...(SECONDARY_ALTERNATIVES[principal] || [])]
     .filter((p, i, arr) => arr.indexOf(p) === i);
   const libre = opciones.find(p => p !== principal && !excluidos.includes(p));
   // Si ya cursó todas las opciones, no se muestra siguiente paso.
@@ -1174,7 +1194,7 @@ function computeResult() {
     if (libre) {
       // Hay una alternativa al programa principal que no cursó.
       principal = libre;
-      excludedNote = `Ya cursaste "${original}" — te sugerimos "${principal}" en su lugar.`;
+      excludedNote = `Ya cursaste "${nombre(original)}" — te sugerimos "${nombre(principal)}" en su lugar.`;
     } else {
       // Escalón 1: se agotaron las alternativas del principal → sube el siguiente paso.
       const sube = pickSecondary(original, a, excluidos);
@@ -1260,7 +1280,7 @@ function opcionesDe(q) {
     const sel = Array.isArray(answers[q.optionsFrom]) ? answers[q.optionsFrom] : [];
     return sel.map(i => ({ i, label: base[i] }));
   }
-  return q.options.map((label, i) => ({ i, label }));
+  return q.options.map((label, i) => ({ i, label: nombre(label) }));
 }
 
 // Toggle de selección múltiple con tope y opción excluyente.
@@ -1387,12 +1407,12 @@ function renderResult() {
   const framingHtml = r.framing ? `<div style="margin-bottom:22px;color:var(--text-muted);font-style:italic;">${r.framing}</div>` : "";
   const noteHtml = r.excludedNote ? `<div class="flag-note">${r.excludedNote}</div>` : "";
   const secIntro = r.secondary && r.secondary.declarado
-    ? `Como también es uno de los objetivos que marcaste, una vez que termines (o estés por terminar) ${r.principal}, te sugerimos sumar ${r.secondary.prog}.`
-    : r.secondary ? `Una vez que termines (o estés por terminar) ${r.principal}, te sugerimos sumar ${r.secondary.prog} como siguiente paso.` : "";
+    ? `Como también es uno de los objetivos que marcaste, una vez que termines (o estés por terminar) ${nombre(r.principal)}, te sugerimos sumar ${nombre(r.secondary.prog)}.`
+    : r.secondary ? `Una vez que termines (o estés por terminar) ${nombre(r.principal)}, te sugerimos sumar ${nombre(r.secondary.prog)} como siguiente paso.` : "";
   const secHtml = r.secondary ? `
     <div class="next-step">
       <div class="next-step-label">Siguiente paso sugerido</div>
-      <div class="next-step-name">${r.secondary.prog}</div>
+      <div class="next-step-name">${nombre(r.secondary.prog)}</div>
       <div class="next-step-why">${secIntro} ${secondaryDisplayText(r.secondary.prog, answers)}</div>
     </div>` : "";
 
@@ -1430,7 +1450,7 @@ function renderResult() {
       <div>
         <div class="result-main">
           <div class="result-eyebrow">Tu programa recomendado</div>
-          <div class="result-name">${r.principal}</div>
+          <div class="result-name">${nombre(r.principal)}</div>
           <div class="result-meta">${info.duration}</div>
           ${ficha && ficha.modalidad ? `<div class="result-modalidad">${ficha.modalidad}</div>` : ""}
           ${r.framing ? `<div class="framing-card"><span class="framing-label">Para vos</span>${r.framing}</div>` : ""}

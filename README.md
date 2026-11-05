@@ -31,6 +31,9 @@ Todo lo editable está al principio del `<script>` en `index.html`:
 - `SIGNUP_URLS` / `SIGNUP_NOTES`: links de inscripción o aviso de inscripciones cerradas.
 - `SOCIAL_LINKS`: pie de página.
 - `CC_WORKSHOPS` / `CC_CONTACT_URL`: talleres de Ciudadanía Conectada.
+- `FICHAS`: ficha de cada programa (modalidad, carga horaria, requisitos, temas, herramientas, certificación, próxima cohorte, link a la landing). Fuente: planilla "Fichas programas XAcademy". Los campos vacíos no se muestran.
+- `SUGERENCIA_POSTERIOR`: siguiente paso sugerido por programa (columna "Sugerencia de programa posterior" de la planilla). Si la persona marcó otro objetivo, ese tiene prioridad.
+- `DISPLAY_NAMES`: nombre que se muestra cuando difiere del interno (p. ej. "Accesibilidad" → "Accesibilidad Digital").
 - `ASSESSMENT_VERSION`: actualizarla cuando cambie la lógica, para distinguir respuestas en la hoja.
 
 Las reglas de recomendación están en `computeResult`, `computeSecondaryFor` y funciones asociadas.
